@@ -1,0 +1,23 @@
+{
+    "name": "backend",
+    "version": "1.0.0",
+    "description": "\"Backend para el proyecto2 de OCL1\"",
+    "main": "index.js",
+    "scripts": {
+        "test": "echo \"Error: no test specified\" && exit 1",
+        "start": "nodemon index.js"
+    },
+    "repository": {
+        "type": "git",
+        "url": "git+https://github.com/dani3l8200/OLC1_Proyecto2_201801364.git"
+    },
+    "author": "Juan Daniel 201801364",
+    "license": "ISC",
+    "bugs": {
+        "url": "https://github.com/dani3l8200/OLC1_Proyecto2_201801364/issues"
+    },
+    "homepage": "https://github.com/dani3l8200/OLC1_Proyecto2_201801364#readme",
+    "dependencies": {
+        "nodemon": "^2.0.4"
+    }
+}
