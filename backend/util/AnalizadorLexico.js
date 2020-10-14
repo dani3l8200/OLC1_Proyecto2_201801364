@@ -1,6 +1,9 @@
 const Token = require('./Token')
 const LinkedList = require('../data_structure/LinkedList');
 
+let ListTokens = new LinkedList();
+let ListErrors = new LinkedList();
+
 class AnalizadorLexico {
     constructor() {
         this.state = 0;
@@ -168,7 +171,7 @@ class AnalizadorLexico {
                             console.log("se finalizo el analisis lexico");
                         } else {
                             this.auxLex += letra;
-                            console.log("ERROR EN " + this.auxLex);
+                            this.addErrors("CARACTER_DESCONOCIDO")
                         }
                     }
                     break;
@@ -339,14 +342,22 @@ class AnalizadorLexico {
     }
 
     addTokens(Type) {
-        LinkedList.append(new Token(this.auxLex, Type, this.column, this.row));
+        ListTokens.append(new Token(this.auxLex, Type, this.column, this.row));
         this.auxLex = "";
         this.state = 0;
     }
+
+    addErrors(Type) {
+        ListErrors.append(new Token(this.auxLex, Type, this.column, this.row));
+        this.auxLex = "";
+        this.state = 0;
+    }
+
 
 }
 
 const test = new AnalizadorLexico();
 let cadena = `(7 + 6) * 5;`;
 test.AnalisisLexico(cadena);
-LinkedList.print();
+ListTokens.print();
+ListErrors.print();
