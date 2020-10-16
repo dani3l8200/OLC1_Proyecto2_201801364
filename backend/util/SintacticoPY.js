@@ -985,6 +985,15 @@ class SyntacticAnalyzer {
 
         let node2 = new Nodo("AssignmentFor");
         this.AssignmentFor(node2);
+
+        let beginWith = this.declarationValue;
+
+        this.declarationValue = "";
+
+        let node3 = new Nodo("Expression");
+        this.Expression(node3);
+
+
     }
 
     contentInterfaz(Node) {
