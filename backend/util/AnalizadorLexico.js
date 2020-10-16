@@ -1,8 +1,9 @@
 const Token = require('./Token')
 const LinkedList = require('../data_structure/LinkedList');
+const SyntacticAnalyzer = require('./SintacticoPY');
+const GraficasAST = require('./GraficarAST');
 
-let ListTokens = new LinkedList();
-let ListErrors = new LinkedList();
+
 
 class AnalizadorLexico {
     constructor() {
@@ -10,6 +11,8 @@ class AnalizadorLexico {
         this.auxLex = "";
         this.column = 0;
         this.row = 1;
+        this.ListTokens = new LinkedList();
+        this.ListErrors = new LinkedList();
     }
 
     VerifyReserved() {
@@ -41,7 +44,7 @@ class AnalizadorLexico {
             case "true":
                 return "TK_TRUE";
             case "do":
-                return "TL_DO";
+                return "TK_DO";
             case "if":
                 return "TK_IF";
             case "else":
@@ -56,8 +59,6 @@ class AnalizadorLexico {
                 return "TK_STATIC";
             case "main":
                 return "TK_MAIN";
-            case "args":
-                return "TK_ARGS";
             case "System":
                 return "TK_SYSTEM";
             case "out":
@@ -166,6 +167,14 @@ class AnalizadorLexico {
                         this.auxLex += letra;
                         this.column += 1;
                         this.addTokens("TK_PRODUCT")
+                    } else if (letra === "]") {
+                        this.auxLex += letra;
+                        this.column += 1;
+                        this.addTokens("TK_CORC");
+                    } else if (letra === "[") {
+                        this.auxLex += letra;
+                        this.column += 1;
+                        this.addTokens("TK_CORA");
                     } else {
                         if (letra === "#" && index === (entra.length - 1)) {
                             console.log("se finalizo el analisis lexico");
@@ -260,6 +269,7 @@ class AnalizadorLexico {
                         this.auxLex += letra;
                         this.addTokens("TK_COMENTARIO_MULTILINEA");
                     }
+                    break;
                 case 9:
                     if (letra === "=") {
                         this.auxLex += letra
@@ -342,13 +352,13 @@ class AnalizadorLexico {
     }
 
     addTokens(Type) {
-        ListTokens.append(new Token(this.auxLex, Type, this.column, this.row));
+        this.ListTokens.append(new Token(this.auxLex, Type, this.column, this.row));
         this.auxLex = "";
         this.state = 0;
     }
 
     addErrors(Type) {
-        ListErrors.append(new Token(this.auxLex, Type, this.column, this.row));
+        this.ListErrors.append(new Token(this.auxLex, Type, this.column, this.row));
         this.auxLex = "";
         this.state = 0;
     }
@@ -356,8 +366,17 @@ class AnalizadorLexico {
 
 }
 
+module.exports = AnalizadorLexico;
 const test = new AnalizadorLexico();
-let cadena = `(7 + 6) * 5;`;
+let cadena = `public class intento{
+    public void nombreFuncion (){    
+        // Bloque de instrucciones
+    }    
+}`;
 test.AnalisisLexico(cadena);
-ListTokens.print();
-ListErrors.print();
+test.ListTokens.print();
+test.ListErrors.print();
+let sintacticoTest = new SyntacticAnalyzer(test.ListTokens);
+console.log(sintacticoTest.traductor.text);
+let graficar = new GraficasAST();
+console.log(graficar.generateString(sintacticoTest.ast));

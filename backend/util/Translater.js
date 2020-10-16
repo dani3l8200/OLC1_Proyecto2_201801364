@@ -6,6 +6,10 @@ class Translater {
         this.text = ""
     }
 
+    ClassOrInterfaz(id, nTabs) {
+        this.text += this.insertTabsInText(nTabs) + "class " + id + ":\n"
+    }
+
     DeclarationOrAssigVariable(name, value, nTabs) {
         this.text += this.insertTabsInText(nTabs) + name + " = " + value + "\n";
     }
@@ -85,7 +89,7 @@ class Translater {
     insertTabsInText(n) {
         let text = "";
         for (let index = 0; index < n; index++) {
-            text += "    "
+            text += "     "
         }
         return text
     }
@@ -94,3 +98,5 @@ class Translater {
         this.text += this.insertTabsInText(nTabs) + content + "\n"
     }
 }
+
+module.exports = Translater;

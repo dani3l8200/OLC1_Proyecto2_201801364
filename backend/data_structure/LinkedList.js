@@ -2,10 +2,11 @@ class LinkedList {
     constructor() {
         this.head = null; //First element of the List
         this.tail = null; //Last element of the List
+        this.count = 0;
     }
 
     append(value) {
-        const newNode = { value: value, next: null };
+        const newNode = { value: value, next: null, count: this.count };
 
         if (this.tail) {
             this.tail.next = newNode;
@@ -16,6 +17,7 @@ class LinkedList {
         if (!this.head) {
             this.head = newNode;
         }
+        this.count++;
 
     }
 
@@ -32,7 +34,7 @@ class LinkedList {
     }
 
     prepend(value) {
-        const newNode = { value: value, next: this.head };
+        const newNode = { value: value, next: this.head, count: this.count };
 
         this.head = newNode;
 
@@ -46,23 +48,30 @@ class LinkedList {
             return;
         }
 
-        while (this.head && this.head.value === value) {
+        while (this.head && this.head.count === value) {
             this.head = this.head.next;
         }
 
         let curNode = this.head;
 
         while (curNode.next) {
-            if (curNode.next.value === value) {
+            if (curNode.next.count === value) {
                 curNode.next = curNode.next.next;
-            } else [
+            } else {
                 curNode = curNode.next
-            ]
+            }
         }
 
-        if (this.tail.value === value) {
+        if (this.tail.count === value) {
             this.tail = curNode;
         }
+        this.count--;
+    }
+
+    deleteAll() {
+        this.head = null;
+        this.tail = null;
+        this.count = 0;
     }
 
     find(value) {

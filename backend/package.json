@@ -18,6 +18,9 @@
     },
     "homepage": "https://github.com/dani3l8200/OLC1_Proyecto2_201801364#readme",
     "dependencies": {
-        "nodemon": "^2.0.4"
+        "body-parser": "^1.19.0",
+        "express": "^4.17.1",
+        "nodemon": "^2.0.4",
+        "string-builder": "^0.1.6"
     }
 }
