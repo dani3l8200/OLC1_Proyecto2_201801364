@@ -68,6 +68,13 @@ class SyntacticAnalyzer {
             this.SentencesListLoop(Node);
         }
     }
+
+    addThings() {
+        this.declarationValue += this.preanalisis.getLexema;
+        this.impressionList.append(this.preanalisis.getLexema);
+        this.ifElseCondition += this.preanalisis.getLexema;
+    }
+
     Start(Node) {
         this.errorList.deleteAll();
         this.looplist.deleteAll();
@@ -993,8 +1000,86 @@ class SyntacticAnalyzer {
         let node3 = new Nodo("Expression");
         this.Expression(node3);
 
+        let flagFor = false;
+        let endWith = "";
+        for (const char of this.declarationValue) {
+            if (flagFor && char != "=") {
+                endWith += char;
+            }
+            if (char === ">" || char === "<" || char === "=") {
+                flagFor = true;
+            }
+        }
 
+        let tk3 = this.preanalisis.getLexema;
+        this.Parea("TK_PUNTOCOMA");
+
+        this.declarationValue = "";
+
+        let node4 = new Nodo("Expression");
+        this.Expression(node4);
+
+        let node5 = new Nodo("OptIncDec");
+        this.OptIncDec(node5);
+
+        let tk4 = this.preanalisis.getLexema;
+        this.Parea("TK_PARENTESISA");
+
+        let tk5 = this.preanalisis.getLexema;
+        this.Parea("TK_LLAVEA");
+
+        if (this.declarationValue.includes('--')) {
+            this.traductor.SFor(this.idFor, beginWith, endWith, this.tabs);
+        } else {
+            this.traductor.SFor(this.idFor, beginWith, endWith, this.tabs);
+        }
+
+        this.looplist.append(1);
+
+        let node6 = new Nodo("SentenceList");
+        this.SentenceList(node6)
+
+        let node7 = new Nodo("");
+        this.AddFuntionOrMethod(node7);
+
+        let node8 = new Nodo("SentencesListLoop");
+        this.SentencesListLoop(node8);
+
+        this.looplist.delete(this.looplist.count);
+
+        this.tabs--;
+
+        let tk6 = this.preanalisis.getLexema;
+        this.Parea("TK_LLAVEC");
+
+        Node.addChilds(new Nodo(tk1));
+        Node.addChilds(new Nodo(tk2));
+        Node.addChilds(node1);
+        Node.addChilds(node2);
+        Node.addChilds(node3);
+        Node.addChilds(new Nodo(tk3));
+        Node.addChilds(node4);
+        Node.addChilds(node5);
+        Node.addChilds(new Nodo(tk4));
+        Node.addChilds(new Nodo(tk5));
+        Node.addChilds(node6);
+        Node.addChilds(node7);
+        Node.addChilds(node8);
+        Node.addChilds(new Nodo(tk6));
     }
+
+    OptType(Node) {
+        if (this.preanalisis.getType === "TK_INT" || this.preanalisis.getType === "TK_DOUBLE" || this.preanalisis.getType === "TK_STRING" ||
+            this.preanalisis.getType === "TK_CHAR" || this.preanalisis.getType === "TK_BOOLEAN") {
+            let node1 = new Nodo("Type");
+            this.Type(node1);
+            Node.addChilds(node1);
+        } else {
+            //Epsilon
+        }
+    }
+
+
 
     contentInterfaz(Node) {
         if (this.preanalisis.getType === "TK_PUBLIC") {
@@ -1011,6 +1096,522 @@ class SyntacticAnalyzer {
             //Epsilon
         }
     }
+
+    AssignmentFor(Node) {
+        this.idFor = this.preanalisis.getLexema;
+
+        let tk1 = this.preanalisis.getLexema;
+        this.Parea("TK_ID");
+
+        let tk2 = this.preanalisis.getLexema;
+        this.Parea("TK_IGUAL");
+
+        let node1 = new Nodo("Expression");
+        this.Expression(node1);
+
+        let tk3 = this.preanalisis.getLexema;
+        this.Parea("TK_PUNTOCOMA");
+
+        Node.addChilds(new Nodo(tk1));
+        Node.addChilds(new Nodo(tk2));
+        Node.addChilds(node1);
+        Node.addChilds(new Nodo(tk3));
+    }
+
+    OptIncDec(Node) {
+        if (this.preanalisis.getType === "TK_INCREMENTO") {
+            this.declarationValue += this.preanalisis.getLexema;
+            let tk1 = this.preanalisis.getLexema;
+            this.Parea("TK_INCREMENTO");
+            Node.addChilds(new Nodo(tk1));
+        } else if (this.preanalisis.getType === "TK_DECREMENTO") {
+            this.declarationValue += this.preanalisis.getLexema;
+            let tk1 = this.preanalisis.getLexema;
+            this.Parea("TK_DECREMENTO");
+            Node.addChilds(new Nodo(tk1));
+        } else {
+            //Epsilon
+        }
+    }
+
+    WhileSentence(Node) {
+        this.declarationValue = "";
+        let tk1 = this.preanalisis.getLexema;
+        this.Parea("TK_WHILE");
+
+        let tk2 = this.preanalisis.getLexema;
+        this.Parea("TK_PARENTESISA");
+
+        let node1 = new Nodo("Expression");
+        this.Expression(node1);
+
+        this.traductor.SWhile(this.declarationValue, this.tabs);
+
+        let tk3 = this.preanalisis.getLexema;
+        this.Parea("TK_PARENTESISC");
+
+        let tk4 = this.preanalisis.getLexema;
+        this.Parea("TK_LLAVEA");
+
+        this.looplist.append(1);
+
+        let node2 = new Nodo("SentenceList")
+        this.SentenceList(node2);
+
+        let node3 = new Nodo("");
+        this.AddFuntionOrMethod(node3);
+
+        let node4 = new Nodo("SentencesListLoop");
+        this.SentencesListLoop(node4);
+
+        this.looplist.delete(this.looplist.count);
+
+        this.tabs--;
+
+        let tk5 = this.preanalisis.getLexema;
+        this.Parea("TK_LLAVEC");
+
+        Node.addChilds(new Nodo(tk1));
+        Node.addChilds(new Nodo(tk2));
+        Node.addChilds(node1);
+        Node.addChilds(new Nodo(tk3));
+        Node.addChilds(new Nodo(tk4));
+        Node.addChilds(node2);
+        Node.addChilds(node3);
+        Node.addChilds(node4);
+        Node.addChilds(new Nodo(tk5));
+    }
+
+    DoWhileSentence(Node) {
+        let tk1 = this.preanalisis.getLexema;
+        this.Parea("TK_DO");
+
+        let tk2 = this.preanalisis.getLexema;
+        this.Parea("TK_LLAVEA");
+
+        this.traductor.BeginDoWhile(this.tabs);
+
+        this.looplist.append(1);
+
+        let node1 = new Nodo("SentenceList");
+        this.SentenceList(node1);
+
+        let node2 = new Nodo("");
+        this.AddFuntionOrMethod(node2);
+
+        let node3 = new Nodo("");
+        this.SentencesListLoop(node3);
+
+        this.tabs--;
+
+        this.looplist.delete(this.looplist.count);
+
+        let tk3 = this.preanalisis.getLexema;
+        this.Parea("TK_LLAVEC");
+
+        let tk4 = this.preanalisis.getLexema;
+        this.Parea("TK_WHILE");
+
+        let tk5 = this.preanalisis.getLexema;
+        this.Parea("TK_PARENTESISA");
+
+        this.declarationValue = "";
+        let node4 = new Nodo("Expression");
+        this.Expression(node4);
+
+        this.traductor.EOFDoWhile(this.declarationValue, this.tabs);
+
+        let tk6 = this.preanalisis.getLexema;
+        this.Parea("TK_PARENTESISC");
+
+        let tk7 = this.preanalisis.getLexema;
+        this.Parea("TK_PUNTOCOMA");
+
+        Node.addChilds(new Nodo(tk1));
+        Node.addChilds(new Nodo(tk2));
+        Node.addChilds(node1);
+        Node.addChilds(node2);
+        Node.addChilds(node3);
+        Node.addChilds(new Nodo(tk3));
+        Node.addChilds(new Nodo(tk4));
+        Node.addChilds(new Nodo(tk5));
+        Node.addChilds(node4);
+        Node.addChilds(new Nodo(tk6));
+        Node.addChilds(new Nodo(tk7));
+    }
+
+    ParameterListCall(Node) {
+        if (this.preanalisis.getType === "TK_CADENA" || this.preanalisis.getType === "TK_DECIMAL" || this.preanalisis.getType === "TK_NUMEROS" ||
+            this.preanalisis.getType === "TK_ID" || this.preanalisis.getType === "TK_FALSE" || this.preanalisis.getType === "TK_TRUE" ||
+            this.preanalisis.getType === "TK_PARENTESISA" || this.preanalisis.getType === "TK_NOT") {
+            let node1 = new Nodo("Expression");
+            this.Expression(node1);
+
+            let node2 = new Nodo("PList");
+            this.PList(node2);
+
+            Node.addChilds(node1);
+            Node.addChilds(node2);
+
+        } else {
+            //Epsilon
+        }
+    }
+
+    PList(Node) {
+        if (this.preanalisis.getType === "TK_COMA") {
+            this.addThings();
+            this.declarationValue += " ";
+
+            let tk1 = this.preanalisis.getLexema;
+            this.Parea("TK_COMA");
+
+            let node1 = new Nodo("Expression");
+            this.Expression(node1);
+
+            let node2 = new Nodo("PList");
+            this.PList(node2);
+
+            Node.addChilds(new Nodo(tk1));
+            Node.addChilds(node1);
+            Node.addChilds(node2);
+        } else {
+            //Epsilon
+        }
+    }
+
+    Expression(Node) {
+        let node1 = new Nodo("OptNot");
+        this.OptNot(node1);
+
+        let node2 = new Nodo("E");
+        this.E(node2);
+
+        let node3 = new Nodo("OptComparisonSymbol");
+        this.OptComparisonSymbol(node3);
+
+        let node4 = new Nodo("AndOrXorOpt");
+        this.AndOrXorOpt(node4);
+
+        Node.addChilds(node1);
+        Node.addChilds(node2);
+        Node.addChilds(node3);
+        Node.addChilds(node4);
+    }
+
+    OptNot(Node) {
+        if (this.preanalisis.getType === "TK_NOT") {
+            this.addThings();
+
+            let tk1 = this.preanalisis.getLexema;
+            this.Parea("TK_NOT");
+
+            let node1 = new Nodo("OptNot");
+            this.OptNot(node1);
+
+            Node.addChilds(new Nodo(tk1));
+            Node.addChilds(node1);
+        } else {
+            //Epsilon
+        }
+    }
+
+    AndOrXorOpt(Node) {
+        if (this.preanalisis.getType === "TK_OR") {
+            this.addThings();
+
+            let tk1 = this.preanalisis.getLexema;
+            this.Parea("TK_OR");
+
+            let node1 = new Nodo("Expression");
+            this.Expression(node1);
+
+            Node.addChilds(new Nodo(tk1));
+            Node.addChilds(node1);
+
+        } else if (this.preanalisis.getType === "TK_AND") {
+            this.addThings();
+
+            let tk1 = this.preanalisis.getLexema;
+            this.Parea("TK_AND");
+
+            let node1 = new Nodo("Expression");
+            this.Expression(node1);
+
+            Node.addChilds(new Nodo(tk1));
+            Node.addChilds(node1);
+        } else if (this.preanalisis.getType === "TK_XOR") {
+            this.addThings();
+
+            let tk1 = this.preanalisis.getLexema;
+            this.Parea("TK_XOR");
+
+            let node1 = new Nodo("Expression");
+            this.Expression(node1);
+
+            Node.addChilds(new Nodo(tk1));
+            Node.addChilds(node1);
+        } else {
+            //Epsilon
+        }
+    }
+
+    OptComparisonSymbol(Node) {
+        if (this.preanalisis.getType === "TK_DISTINTO") {
+            this.addThings();
+
+            let tk1 = this.preanalisis.getLexema;
+            this.Parea("TK_DISTINTO");
+
+            let node1 = new Nodo("E");
+            this.E(node1);
+
+            Node.addChilds(new Nodo(tk1));
+            Node.addChilds(node1);
+        } else if (this.preanalisis.getType === "TK_COMPARACION") {
+            this.addThings();
+
+            let tk1 = this.preanalisis.getLexema;
+            this.Parea("TK_COMPARACION");
+
+            let node1 = new Nodo("E");
+            this.E(node1);
+
+            Node.addChilds(new Nodo(tk1));
+            Node.addChilds(node1);
+        } else if (this.preanalisis.getType === "TK_MENORIGUAL") {
+            this.addThings();
+
+            let tk1 = this.preanalisis.getLexema;
+            this.Parea("TK_MENORIGUAL");
+
+            let node1 = new Nodo("E");
+            this.E(node1);
+
+            Node.addChilds(new Nodo(tk1));
+            Node.addChilds(node1);
+        } else if (this.preanalisis.getType === "TK_MAYORIGUAL") {
+            this.addThings();
+
+            let tk1 = this.preanalisis.getLexema;
+            this.Parea("TK_MAYORIGUAL");
+
+            let node1 = new Nodo("E");
+            this.E(node1);
+
+            Node.addChilds(new Nodo(tk1));
+            Node.addChilds(node1);
+        } else if (this.preanalisis.getType === "TK_MAYOR") {
+            this.addThings();
+
+            let tk1 = this.preanalisis.getLexema;
+            this.Parea("TK_MAYOR");
+
+            let node1 = new Nodo("E");
+            this.E(node1);
+
+            Node.addChilds(new Nodo(tk1));
+            Node.addChilds(node1);
+        } else if (this.preanalisis.getType === "TK_MENOR") {
+            this.addThings();
+
+            let tk1 = this.preanalisis.getLexema;
+            this.Parea("TK_MENOR");
+
+            let node1 = new Nodo("E");
+            this.E(node1);
+
+            Node.addChilds(new Nodo(tk1));
+            Node.addChilds(node1);
+        } else {
+            //Epsilon
+        }
+    }
+
+    E(Node) {
+        let node1 = new Nodo("T");
+        this.T(node1);
+
+        let node2 = new Nodo("EP");
+        this.EP(node2);
+
+        Node.addChilds(node1);
+        Node.addChilds(node2);
+    }
+
+    EP(Node) {
+        if (this.preanalisis.getType === "TK_MAS") {
+            this.addThings();
+            let tk1 = this.preanalisis.getLexema;
+            this.Parea("TK_MAS");
+
+            let node1 = new Nodo('T');
+            this.T(node1);
+
+            let node2 = new Nodo("EP");
+            this.EP(node2);
+
+            Node.addChilds(new Nodo(tk1));
+            Node.addChilds(node1);
+            Node.addChilds(node2);
+        } else if (this.preanalisis.getType === "TK_MENOS") {
+            this.addThings();
+            let tk1 = this.preanalisis.getLexema;
+            this.Parea("TK_MENOS");
+
+            let node1 = new Nodo('T');
+            this.T(node1);
+
+            let node2 = new Nodo("EP");
+            this.EP(node2);
+
+            Node.addChilds(new Nodo(tk1));
+            Node.addChilds(node1);
+            Node.addChilds(node2);
+        } else {
+            //Epsilon
+        }
+    }
+
+    T(Node) {
+        let node1 = new Nodo("F");
+        this.F(node1);
+
+        let node2 = new Nodo("TP");
+        this.TP(node2);
+
+        Node.addChilds(node1);
+        Node.addChilds(node2);
+    }
+
+    TP(Node) {
+        if (this.preanalisis.getType === "TK_DIVISION") {
+            this.addThings();
+
+            let tk1 = this.preanalisis.getLexema;
+            this.Parea("TK_DIVISION");
+
+            let node1 = new Nodo('F');
+            this.F(node1);
+
+            let node2 = new Nodo("TP");
+            this.TP(node2);
+
+            Node.addChilds(new Nodo(tk1));
+            Node.addChilds(node1);
+            Node.addChilds(node2);
+        } else if (this.preanalisis.getType === "TK_PRODUCT") {
+            this.addThings();
+
+            let tk1 = this.preanalisis.getLexema;
+            this.Parea("TK_PRODUCT");
+
+            let node1 = new Nodo('F');
+            this.F(node1);
+
+            let node2 = new Nodo("TP");
+            this.TP(node2);
+
+            Node.addChilds(new Nodo(tk1));
+            Node.addChilds(node1);
+            Node.addChilds(node2);
+        } else {
+            //Epsilon
+        }
+    }
+
+    F(Node) {
+        let node1 = new Nodo("OptNot");
+        this.OptNot(node1);
+
+        let node2 = new Nodo("FF");
+        this.FF(node2);
+
+        Node.addChilds(node1);
+        Node.addChilds(node2);
+    }
+
+    FF(Node) {
+        if (this.preanalisis.getType === "TK_NUMEROS") {
+            this.addThings();
+            let tk1 = this.preanalisis.getLexema;
+            this.Parea("TK_NUMEROS");
+            Node.addChilds(new Nodo(tk1));
+        } else if (this.preanalisis.getType === "TK_DECIMAL") {
+            this.addThings();
+            let tk1 = this.preanalisis.getLexema;
+            this.Parea("TK_DECIMAL");
+            Node.addChilds(new Nodo(tk1));
+        } else if (this.preanalisis.getType === "TK_CADENA") {
+            this.addThings();
+            let tk1 = this.preanalisis.getLexema;
+            this.Parea("TK_CADENA");
+            Node.addChilds(new Nodo(tk1));
+        } else if (this.preanalisis.getType === "TK_ID") {
+            this.addThings();
+            let tk1 = this.preanalisis.getLexema;
+            this.Parea("TK_ID");
+
+            let node1 = new Nodo("OptUseFunction");
+            this.OptUseFunction(node1);
+
+            Node.addChilds(new Nodo(tk1));
+            Node.addChilds(node1);
+        } else if (this.preanalisis.getType === "TK_TRUE") {
+            this.addThings();
+            let tk1 = this.preanalisis.getLexema;
+            this.Parea("TK_TRUE");
+            Node.addChilds(new Nodo(tk1));
+        } else if (this.preanalisis.getType === "TK_FALSE") {
+            this.addThings();
+            let tk1 = this.preanalisis.getLexema;
+            this.Parea("TK_FALSE");
+            Node.addChilds(new Nodo(tk1));
+        } else if (this.preanalisis.getType === "TK_PARENTESISA") {
+            this.addThings();
+
+            let tk1 = this.preanalisis.getLexema;
+            this.Parea("TK_PARENTESISA");
+
+            let node1 = new Nodo("Expression");
+            this.Expression(node1);
+
+            this.addThings();
+
+            let tk2 = this.preanalisis.getLexema;
+            this.Parea('TK_PARENTESISC');
+
+            Node.addChilds(new Nodo(tk1));
+            Node.addChilds(node1);
+            Node.addChilds(new Nodo(tk2));
+        } else {
+            this.Parea("VALORES");
+        }
+    }
+
+    OptUseFunction(Node) {
+        if (this.preanalisis.getType === "TK_PARENTESISA") {
+            this.addThings();
+
+            let tk1 = this.preanalisis.getLexema;
+            this.Parea("TK_PARENTESISA");
+
+            let node1 = new Nodo("ParameterListCall");
+            this.ParameterListCall(node1);
+
+            this.addThings();
+
+            let tk2 = this.preanalisis.getLexema;
+            this.Parea("TK_PARENTESISC");
+
+            Node.addChilds(new Nodo(tk1));
+            Node.addChilds(node1);
+            Node.addChilds(new Nodo(tk2));
+        } else {
+            //Epsilon
+        }
+    }
+
     FuntionI(Node) {
         if (this.preanalisis.getType === "TK_INT" || this.preanalisis.getType === "TK_DOUBLE" || this.preanalisis.getType === "TK_STRING" ||
             this.preanalisis.getType === "TK_CHAR" || this.preanalisis.getType === "TK_BOOLEAN") {
