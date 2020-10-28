@@ -1,10 +1,9 @@
 const LinkedList = require("./LinkedList");
 
 class Nodo {
-    constructor(Type, Value) {
+    constructor(Value) {
         this.id = 0;
         this.Value = Value;
-        this.Type = Type;
         this.childrens = new LinkedList();
     }
 
@@ -41,5 +40,4 @@ class Nodo {
     }
 
 }
-
 module.exports = Nodo;
