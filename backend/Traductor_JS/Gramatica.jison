@@ -6,7 +6,11 @@
     let listTokens = new LinkedList();
     let idError = 1;
     var auxNodo = new Nodo('');
+    let traduccion = ""
+    let tabs = 0;
     let idToken = 1;
+    let counterIF = 1;
+    let auxName = "";
     let erroLine = 0;
     let errorColumn = 0;
     let errorList = [];
@@ -29,7 +33,7 @@ stringContent           ({stringType}((?:\\{stringType}|(?:(?!{stringType}).))*)
 
 %%
 \s+                     /* skip whitespace */
-{comentarioMultilinea}    {listTokens.append(new Token(idToken,"commentMultilineaOrUnilinea",yytext,yylloc.first_line,yylloc.first_column)); idToken++;}  /* skip Single Line Comment AND Multiline Comment */
+{comentarioMultilinea}    {listTokens.append(new Token(idToken,"commentMultilineaOrUnilinea",yytext,yylloc.first_line,yylloc.first_column)); idToken++; traduccion +=  yytext + "\n";}  /* skip Single Line Comment AND Multiline Comment */
 
 "{"                     {listTokens.append(new Token(idToken,"SYM_LLAVEA",yytext,yylloc.first_line,yylloc.first_column)); idToken++; return '{';}
 "}"                     {listTokens.append(new Token(idToken,"SYM_LLAVEC",yytext,yylloc.first_line,yylloc.first_column)); idToken++; return '}';}
@@ -39,6 +43,8 @@ stringContent           ({stringType}((?:\\{stringType}|(?:(?!{stringType}).))*)
 "."                     {listTokens.append(new Token(idToken,"SYM_PUNTO",yytext,yylloc.first_line,yylloc.first_column)); idToken++; return '.';}
 ":"                     {listTokens.append(new Token(idToken,"SYM_DOSPUNTOS",yytext,yylloc.first_line,yylloc.first_column)); idToken++; return ':';}
 ";"                     {listTokens.append(new Token(idToken,"SYM_PUNTOCOMA",yytext,yylloc.first_line,yylloc.first_column)); idToken++; return ';';}
+"["                     {listTokens.append(new Token(idToken,"SYM_CORCHA",yytext,yylloc.first_line,yylloc.first_column)); idToken++; return '[';}
+"]"                     {listTokens.append(new Token(idToken,"SYM_CORCHC",yytext,yylloc.first_line,yylloc.first_column)); idToken++; return ']';}
 
 "boolean"               {listTokens.append(new Token(idToken,"BOOLEAN",yytext,yylloc.first_line,yylloc.first_column)); idToken++; return 'boolean';}
 "break"                 {listTokens.append(new Token(idToken,"BREAK",yytext,yylloc.first_line,yylloc.first_column)); idToken++; return 'break';}
@@ -63,8 +69,12 @@ stringContent           ({stringType}((?:\\{stringType}|(?:(?!{stringType}).))*)
 "while"                 {listTokens.append(new Token(idToken,"WHILE",yytext,yylloc.first_line,yylloc.first_column)); idToken++; return 'while';}
 "public"                {listTokens.append(new Token(idToken,"PUBLIC",yytext,yylloc.first_line,yylloc.first_column)); idToken++; return 'public';}
 "interface"             {listTokens.append(new Token(idToken,"INTERFACE",yytext,yylloc.first_line,yylloc.first_column)); idToken++; return 'interface';}
+'main'                  {listTokens.append(new Token(idToken,"MAIN",yytext,yylloc.first_line,yylloc.first_column)); idToken++; return 'main';}
+'static'                {listTokens.append(new Token(idToken,"STATIC",yytext,yylloc.first_line,yylloc.first_column)); idToken++; return 'static';}
 
 "<="                    {listTokens.append(new Token(idToken,"OP_MENORIGUAL",yytext,yylloc.first_line,yylloc.first_column)); idToken++; return '<=';}
+"+="                    {listTokens.append(new Token(idToken,"OP_CONCAT",yytext,yylloc.first_line,yylloc.first_column)); idToken++; return '+=';}
+"-="                    {listTokens.append(new Token(idToken,"OP_DESCONCAT",yytext,yylloc.first_line,yylloc.first_column)); idToken++; return '-=';}
 "<"                     {listTokens.append(new Token(idToken,"OP_MENOR",yytext,yylloc.first_line,yylloc.first_column)); idToken++; return '<';}
 "=="                    {listTokens.append(new Token(idToken,"OP_COMPARACION",yytext,yylloc.first_line,yylloc.first_column)); idToken++; return '==';}
 ">="                    {listTokens.append(new Token(idToken,"OP_MAYORIGUAL",yytext,yylloc.first_line,yylloc.first_column)); idToken++; return '>=';}
@@ -106,17 +116,24 @@ stringContent           ({stringType}((?:\\{stringType}|(?:(?!{stringType}).))*)
 %start START
 %% /* language grammar */
 
-START : ListsClass 'EOF'  { $$ = new Nodo('Start'); $$.addChildrens($1);  auxNodo = $$; console.log(auxNodo); return auxNodo; }    
+START : ListsClass 'EOF'  { if (errorList.length > 0) { let eL = []; eL = eL.concat(errorList); errorList = []; idError = 0; return [eL]}  $$ = new Nodo('Start'); $$.addChildrens($1); $$.traduccion += $1.traduccion; traduccion += $$.traduccion; console.log(auxNodo);  return [$$,traduccion]; }    
       | 'EOF'
       | error                   
       ;
 
-ListsClass: ListsClass CLASSESORINTERFACE {$$ = new Nodo('ListsClass'); $$.addChildrens($1); $$.addChildrens($2);}
-          | CLASSESORINTERFACE { $$ = new Nodo('ListsClass'); $$.addChildrens($1); }
+ListsClass: ListsClass CLASSESORINTERFACE {$$ = new Nodo('ListsClass'); $$.addChildrens($1); $$.addChildrens($2); $$.traduccion += $1.traduccion  + $2.traduccion;}
+          | CLASSESORINTERFACE { $$ = new Nodo('ListsClass'); $$.addChildrens($1); $$.traduccion +=  $1.traduccion;}
           ;
 
-CLASSESORINTERFACE: 'public' 'class' 'identifier' '{' BODYC '}'  { $$ = new Nodo('CLASSESORINTERFACE'); $$.addChildrens(new Nodo($1)); $$.addChildrens(new Nodo($2)); $$.addChildrens(new Nodo($3)); $$.addChildrens(new Nodo($4)); $$.addChildrens($5); $$.addChildrens(new Nodo($6)); }
-        | 'public' 'interface' 'identifier' '{' BODYI '}' { $$ = new Nodo('CLASSESORINTERFACE'); $$.addChildrens(new Nodo($1)); $$.addChildrens(new Nodo($2)); $$.addChildrens(new Nodo($3)); $$.addChildrens(new Nodo($4)); $$.addChildrens($5); $$.addChildrens(new Nodo($6)); }
+CLASSESORINTERFACE: 'public' 'class' 'identifier' '{' BODYC '}'  {$$ = new Nodo('CLASSESORINTERFACE'); $$.addChildrens(new Nodo($1)); $$.addChildrens(new Nodo($2)); $$.addChildrens(new Nodo($3)); $$.addChildrens(new Nodo($4));
+                                                                    $$.addChildrens($5); $$.addChildrens(new Nodo($6));
+                                                                    $$.traduccion += $2 + " " + $3 + " " + $4 + "\n" + $$.insertTabsInText(1) + "constructor() {}\n\n"
+                                                                     + $5.traduccion + "\n"+ $6 + "\n";}
+        | 'public' 'interface' 'identifier' '{' BODYI '}' { $$ = new Nodo('CLASSESORINTERFACE'); $$.addChildrens(new Nodo($1)); $$.addChildrens(new Nodo($2)); 
+                                                            $$.addChildrens(new Nodo($3)); $$.addChildrens(new Nodo($4)); $$.addChildrens($5);
+                                                            $$.addChildrens(new Nodo($6)); $$.traduccion += $2 + " " + $3 + " " + $4 + " " + "\n" +
+                                                            $$.insertTabsInText(1) + "constructor(){}\n\n" + $5.traduccion +"\n" + $6 + "\n";}
+
         | 'public' 'class' 'identifier' '{' '}' {$$ = new Nodo('CLASSESORINTERFACE'); $$.addChildrens(new Nodo($1)); $$.addChildrens(new Nodo($2)); $$.addChildrens(new Nodo($3)); $$.addChildrens(new Nodo($4)); $$.addChildrens(new Nodo($5)); }
         | 'public' 'interface' 'identifier' '{' '}' {$$ = new Nodo('CLASSESORINTERFACE'); $$.addChildrens(new Nodo($1)); $$.addChildrens(new Nodo($2)); $$.addChildrens(new Nodo($3)); $$.addChildrens(new Nodo($4)); $$.addChildrens(new Nodo($5)); }
         | 'public' 'class' error '{' BODYC '}'        { errorList.push(new Error(idError, 'Syntactic error', this._$.first_line, this._$.first_column, yytext)); console.error('Syntactic error: ' + yytext  + ' in the line ' + this._$.first_line + ' and column ' + this._$.first_column); idError++; }
@@ -124,161 +141,334 @@ CLASSESORINTERFACE: 'public' 'class' 'identifier' '{' BODYC '}'  { $$ = new Nodo
         | error ERROR        { errorList.push(new Error(idError, 'Syntactic error', this._$.first_line, this._$.first_column, yytext)); console.error('Syntactic error: ' + yytext  + ' in the line ' + this._$.first_line + ' and column ' + this._$.first_column); idError++; }
         ; 
 
-BODYI :  BODYI METHODI {$$ = new Nodo('BODYI'); $$.addChildrens($1); $$.addChildrens($2);}
-      | METHODI {$$ = new Nodo('BODYI'); $$.addChildrens($1);}
+BODYI :  BODYI METHODI {$$ = new Nodo('BODYI'); $$.addChildrens($1); $$.addChildrens($2); $$.traduccion += $1.traduccion + $2.traduccion;}
+      | METHODI {$$ = new Nodo('BODYI'); $$.addChildrens($1); $$.traduccion += $1.traduccion;}
       | error ERROR { errorList.push(new Error(idError, 'Syntactic error', this._$.first_line, this._$.first_column, yytext)); console.error('Syntactic error: ' + yytext  + ' in the line ' + this._$.first_line + ' and column ' + this._$.first_column); idError++; }
 ;
 
-METHODI : 'public' 'void'  'identifier'  '(' ')' ';' {$$ = new Nodo('METHODI'); $$.addChildrens(new Nodo($1)); $$.addChildrens(new Nodo($2)); $$.addChildrens(new Nodo($3)); $$.addChildrens(new Nodo($4)); $$.addChildrens(new Nodo($5)); $$.addChildrens(new Nodo($6)); }
-        | 'public' TYPE 'identifier' '(' ')' ';' {$$ = new Nodo('METHODI'); $$.addChildrens(new Nodo($1)); $$.addChildrens($2); $$.addChildrens(new Nodo($3)); $$.addChildrens(new Nodo($4)); $$.addChildrens(new Nodo($5)); $$.addChildrens(new Nodo($6));}
-        | 'public' TYPE 'identifier' '(' PARAMS ')' ';' {$$ = new Nodo('METHODC'); $$.addChildrens(new Nodo($1)); $$.addChildrens($2); $$.addChildrens(new Nodo($3)); $$.addChildrens(new Nodo($4)); $$.addChildrens($5); $$.addChildrens(new Nodo($6)); $$.addChildrens(new Nodo($7));}
-        | 'public' 'void' 'identifier' '(' PARAMS ')' ';'  {$$ = new Nodo('METHODC'); $$.addChildrens(new Nodo($1)); $$.addChildrens(new Nodo($2)); $$.addChildrens(new Nodo($3)); $$.addChildrens(new Nodo($4)); $$.addChildrens($5); $$.addChildrens(new Nodo($6)); $$.addChildrens(new Nodo($7));}
+METHODI : 'public' 'void'  'identifier'  '(' ')' ';' {$$ = new Nodo('METHODI'); $$.addChildrens(new Nodo($1)); $$.addChildrens(new Nodo($2)); $$.addChildrens(new Nodo($3));
+                                                      $$.addChildrens(new Nodo($4)); $$.addChildrens(new Nodo($5)); $$.addChildrens(new Nodo($6)); }
+
+        | 'public' TYPE 'identifier' '(' ')' ';' {$$ = new Nodo('METHODI'); $$.addChildrens(new Nodo($1)); $$.addChildrens($2); 
+                                                  $$.addChildrens(new Nodo($3)); $$.addChildrens(new Nodo($4)); $$.addChildrens(new Nodo($5)); 
+                                                  $$.addChildrens(new Nodo($6));}
+
+        | 'public' TYPE 'identifier' '(' PARAMS ')' ';' {$$ = new Nodo('METHODI'); $$.addChildrens(new Nodo($1)); $$.addChildrens($2); $$.addChildrens(new Nodo($3));
+                                                        $$.addChildrens(new Nodo($4)); $$.addChildrens($5); $$.addChildrens(new Nodo($6));
+                                                        $$.addChildrens(new Nodo($7));}
+                                                         
+        | 'public' 'void' 'identifier' '(' PARAMS ')' ';'  {$$ = new Nodo('METHODI'); $$.addChildrens(new Nodo($1)); $$.addChildrens(new Nodo($2)); $$.addChildrens(new Nodo($3)); $$.addChildrens(new Nodo($4));
+                                                            $$.addChildrens($5); $$.addChildrens(new Nodo($6)); $$.addChildrens(new Nodo($7));}
+
         | 'void' error  { errorList.push(new Error(idError, 'Syntactic error', this._$.first_line, this._$.first_column, yytext)); console.error('Syntactic error: ' + yytext  + ' in the line ' + this._$.first_line + ' and column ' + this._$.first_column); idError++; }
 ;
 
-BODYC : BODYC METHODC {$$ = new Nodo('BODYC'); $$.addChildrens($1); $$.addChildrens($2);}
-      | BODYC DECLARATION {$$ = new Nodo('BODYC'); $$.addChildrens($1); $$.addChildrens($2);}
-      | DECLARATION {$$ = new Nodo('BODYC'); $$.addChildrens($1); }
-      | METHODC {$$ = new Nodo('BODYC'); $$.addChildrens($1);}
+BODYC : BODYC METHODC {$$ = new Nodo('BODYC'); $$.addChildrens($1); $$.addChildrens($2); $$.traduccion += $1.traduccion +  $2.traduccion;}
+      | BODYC DECLARATION {$$ = new Nodo('BODYC'); $$.addChildrens($1); $$.addChildrens($2);  $$.traduccion +=  $1.traduccion  + $2.traduccion;}
+      | BODYC MAIN {$$ = new Nodo('BODYC'); $$.addChildrens($1); $$.addChildrens($2); $$.traduccion +=  $1.traduccion  + $2.traduccion;}
+      | DECLARATION {$$ = new Nodo('BODYC'); $$.addChildrens($1); $$.traduccion += $1.traduccion; }
+      | METHODC {$$ = new Nodo('BODYC'); $$.addChildrens($1); $$.traduccion += $1.traduccion; }
+      | MAIN  {$$ = new Nodo('BODYC'); $$.addChildrens($1); $$.traduccion += $1.traduccion;}
       | error ERROR { errorList.push(new Error(idError, 'Syntactic error', this._$.first_line, this._$.first_column, yytext)); console.error('Syntactic error: ' + yytext  + ' in the line ' + this._$.first_line + ' and column ' + this._$.first_column); idError++; }
 
 ;
 
-METHODC : 'public' 'void'  'identifier'  '(' ')' BODY {$$ = new Nodo('METHODC');$$.addChildrens(new Nodo($1)); $$.addChildrens(new Nodo($2)); $$.addChildrens(new Nodo($3)); $$.addChildrens(new Nodo($4)); $$.addChildrens(new Nodo($5)); $$.addChildrens($6);}
-        | 'public' TYPE 'identifier' '(' ')'  BODY {$$ = new Nodo('METHODC'); $$.addChildrens(new Nodo($1)); $$.addChildrens($2); $$.addChildrens(new Nodo($3)); $$.addChildrens(new Nodo($4)); $$.addChildrens(new Nodo($5)); $$.addChildrens($6);}
-        | 'public' 'void' 'identifier' '(' PARAMS ')' BODY  {$$ = new Nodo('METHODC'); $$.addChildrens(new Nodo($1)); $$.addChildrens(new Nodo($2)); $$.addChildrens(new Nodo($3)); $$.addChildrens(new Nodo($4)); $$.addChildrens($5); $$.addChildrens(new Nodo($6)); $$.addChildrens($7);}
-        | 'public' TYPE 'identifier' '(' PARAMS ')' BODY  {$$ = new Nodo('METHODC'); $$.addChildrens(new Nodo($1)); $$.addChildrens($2); $$.addChildrens(new Nodo($3)); $$.addChildrens(new Nodo($4)); $$.addChildrens($5); $$.addChildrens(new Nodo($6)); $$.addChildrens($7);}
+MAIN : 'public' 'static' 'void' 'main'  '(' 'String' '[' ']' 'identifier' ')' BODY {$$ = new Nodo('MAIN'); $$.addChildrens(new Nodo($1)); $$.addChildrens(new Nodo($2));
+                                                                                    $$.addChildrens(new Nodo($3)); $$.addChildrens(new Nodo($4)); $$.addChildrens(new Nodo($5)); 
+                                                                                    $$.addChildrens(new Nodo($6)); $$.addChildrens(new Nodo($7)); $$.addChildrens(new Nodo($8)); 
+                                                                                    $$.addChildrens(new Nodo($9)); $$.addChildrens(new Nodo($10)); $$.addChildrens($11);
+                                                                                    $$.traduccion += " " + $11.traduccion;}
+
+     | 'public' 'static' 'void' 'main'  '('  ')' BODY {$$ = new Nodo('MAIN'); $$.addChildrens(new Nodo($1)); $$.addChildrens(new Nodo($2)); 
+                                                       $$.addChildrens(new Nodo($3)); $$.addChildrens(new Nodo($4)); $$.addChildrens(new Nodo($5));
+                                                        $$.addChildrens(new Nodo($6)); $$.addChildrens($7); $$.traduccion += " " + $7.traduccion;}
+
+     | 'static' error  { errorList.push(new Error(idError, 'Syntactic error', this._$.first_line, this._$.first_column, yytext)); console.error('Syntactic error: ' + yytext  + ' in the line ' + this._$.first_line + ' and column ' + this._$.first_column); idError++; }
+;
+
+METHODC : 'public' 'void'  'identifier'  '(' ')' BODY {$$ = new Nodo('METHODC');$$.addChildrens(new Nodo($1)); $$.addChildrens(new Nodo($2)); $$.addChildrens(new Nodo($3));
+                                                      $$.addChildrens(new Nodo($4)); $$.addChildrens(new Nodo($5)); $$.addChildrens($6); 
+                                                      $$.traduccion +=  $$.insertTabsInText(1) + "function " + $3 + $4 + $5 + " " + $6.traduccion;}
+
+        | 'public' TYPE 'identifier' '(' ')'  BODY {$$ = new Nodo('METHODC'); $$.addChildrens(new Nodo($1)); $$.addChildrens($2); $$.addChildrens(new Nodo($3)); $$.addChildrens(new Nodo($4));
+                                                    $$.addChildrens(new Nodo($5)); $$.addChildrens($6);
+                                                    $$.traduccion += $$.insertTabsInText(1) + "function " + $3 + $4 + $5 + " " + $6.traduccion;}
+        
+        | 'public' 'void' 'identifier' '(' PARAMS ')' BODY  {$$ = new Nodo('METHODC'); $$.addChildrens(new Nodo($1)); $$.addChildrens(new Nodo($2)); $$.addChildrens(new Nodo($3)); 
+                                                             $$.addChildrens(new Nodo($4)); $$.addChildrens($5); $$.addChildrens(new Nodo($6)); $$.addChildrens($7); 
+                                                             $$.traduccion +=  $$.insertTabsInText(1) + "function " + $3 + " " + $4 + " " + $5.traduccion + " " + $6 + " " + $7.traduccion;}
+
+        | 'public' TYPE 'identifier' '(' PARAMS ')' BODY  {$$ = new Nodo('METHODC'); $$.addChildrens(new Nodo($1)); $$.addChildrens($2); $$.addChildrens(new Nodo($3)); $$.addChildrens(new Nodo($4));
+                                                           $$.addChildrens($5); $$.addChildrens(new Nodo($6)); $$.addChildrens($7); 
+                                                           $$.traduccion += $$.insertTabsInText(1) + "function " + $3 + " " + $4 + " " + $5.traduccion + " " + $6 + " " + $7.traduccion; }
+
         | 'void' error  { errorList.push(new Error(idError, 'Syntactic error', this._$.first_line, this._$.first_column, yytext)); console.error('Syntactic error: ' + yytext  + ' in the line ' + this._$.first_line + ' and column ' + this._$.first_column); idError++; }
 ;
 
-TYPE : 'int' {$$ = new Nodo('TYPE'); $$.addChildrens(new Nodo($1));}
-     | 'double' {$$ = new Nodo('TYPE'); $$.addChildrens(new Nodo($1));}
-     | 'boolean' {$$ = new Nodo('TYPE'); $$.addChildrens(new Nodo($1));}
-     | 'char' {$$ = new Nodo('TYPE'); $$.addChildrens(new Nodo($1));}
-     | 'String'  {$$ = new Nodo('TYPE'); $$.addChildrens(new Nodo($1));}
+TYPE : 'int' {$$ = new Nodo('TYPE'); $$.addChildrens(new Nodo($1)); $$.traduccion += 'var ';}
+     | 'double' {$$ = new Nodo('TYPE'); $$.addChildrens(new Nodo($1)); $$.traduccion += 'var ';}
+     | 'boolean' {$$ = new Nodo('TYPE'); $$.addChildrens(new Nodo($1)); $$.traduccion += 'var ';}
+     | 'char' {$$ = new Nodo('TYPE'); $$.addChildrens(new Nodo($1)); $$.traduccion += 'var ';}
+     | 'String'  {$$ = new Nodo('TYPE'); $$.addChildrens(new Nodo($1)); $$.traduccion += 'var ';}
      ;
-PARAMS : PARAMS ',' PARAM {$$ = new Nodo('PARAMS'); $$.addChildrens($1); $$.addChildrens(new Nodo($2)); $$.addChildrens($3);}
-       | PARAM {$$ = new Nodo('PARAMS'); $$.addChildrens($1);}
+PARAMS : PARAMS ',' PARAM {$$ = new Nodo('PARAMS'); $$.addChildrens($1); $$.addChildrens(new Nodo($2)); $$.addChildrens($3);
+                           $$.traduccion += $1.traduccion + $2  +  $3.traduccion;}
+
+       | PARAM {$$ = new Nodo('PARAMS'); $$.addChildrens($1); $$.traduccion += $1.traduccion;}
 ;
 
-PARAM : TYPE 'identifier' {$$ = new Nodo('PARAM'); $$.addChildrens($1); $$.addChildrens(new Nodo($2));}
+PARAM : TYPE 'identifier' {$$ = new Nodo('PARAM'); $$.addChildrens($1); $$.addChildrens(new Nodo($2)); $$.traduccion += $2}
       | error { errorList.push(new Error(idError, 'Syntactic error', this._$.first_line, this._$.first_column, yytext)); console.error('Syntactic error: ' + yytext  + ' in the line ' + this._$.first_line + ' and column ' + this._$.first_column); idError++; }
       ;
 
-BODY : '{' '}' {$$ = new Nodo('BODY'); $$.addChildrens(new Nodo($1)); $$.addChildrens(new Nodo($2));}
-     | '{' SENTENCES '}' {$$ = new Nodo('BODY'); $$.addChildrens(new Nodo($1)); $$.addChildrens($2); $$.addChildrens(new Nodo($3));}
+BODY : '{' '}' {$$ = new Nodo('BODY'); $$.addChildrens(new Nodo($1)); $$.addChildrens(new Nodo($2));
+                $$.traduccion += $1 + "\n\n"  + $2 + "\n";}
+
+     | '{' SENTENCES '}' {$$ = new Nodo('BODY'); $$.addChildrens(new Nodo($1)); $$.addChildrens($2); $$.addChildrens(new Nodo($3));
+                         $$.traduccion += $1 + "\n\n" + $2.traduccion + $$.insertTabsInText(1) + $3 + "\n\n";}
+
      | error { errorList.push(new Error(idError, 'Syntactic error', this._$.first_line, this._$.first_column, yytext)); console.error('Syntactic error: ' + yytext  + ' in the line ' + this._$.first_line + ' and column ' + this._$.first_column); idError++; }
     ;
 
-SENTENCES :  SENTENCES SENTENCE {$$ = new Nodo('SENTENCES'); $$.addChildrens($1); $$.addChildrens($2);}
-          |  SENTENCE {$$ = new Nodo('SENTENCES'); $$.addChildrens($1);}
-;
+SENTENCES :  SENTENCES SENTENCE {$$ = new Nodo('SENTENCES'); $$.addChildrens($1); $$.addChildrens($2);
+                                 $$.traduccion += $1.traduccion  + $2.traduccion;}
+          |  SENTENCE {$$ = new Nodo('SENTENCES'); $$.addChildrens($1);  $$.traduccion +=  $1.traduccion;}
+;     
 
-SENTENCE : DECLARATION {$$ = new Nodo('SENTENCE'); $$.addChildrens($1);}
-         | ASSIGMENT {$$ = new Nodo('SENTENCE'); $$.addChildrens($1);}
-         | CALLMETHOD {$$ = new Nodo('SENTENCE'); $$.addChildrens($1);}
-         | PRINTS {$$ = new Nodo('SENTENCE'); $$.addChildrens($1);}
-         | IFS {$$ = new Nodo('SENTENCE'); $$.addChildrens($1);}
-         | FOR {$$ = new Nodo('SENTENCE'); $$.addChildrens($1);}
-         | WHILE {$$ = new Nodo('SENTENCE'); $$.addChildrens($1);}
-         | DOWHILE  {$$ = new Nodo('SENTENCE'); $$.addChildrens($1);}
-         | RETURN  {$$ = new Nodo('SENTENCE'); $$.addChildrens($1);}
-         | BREAK   {$$ = new Nodo('SENTENCE'); $$.addChildrens($1);}
-         | CONTINUE  {$$ = new Nodo('SENTENCE'); $$.addChildrens($1);}
+SENTENCE : DECLARATION {$$ = new Nodo('SENTENCE'); $$.addChildrens($1);
+                        tabs += 2; 
+                        $$.traduccion += $1.insertTabsInText(tabs) + $1.traduccion; tabs -= 2;}
+         | ASSIGMENT {$$ = new Nodo('SENTENCE'); $$.addChildrens($1); tabs+=2; $$.traduccion += $1.insertTabsInText(tabs) + $1.traduccion; tabs -= 2;}
+         | CALLMETHOD ';' {$$ = new Nodo('SENTENCE'); $$.addChildrens($1); $$.addChildrens(new Nodo($2)); tabs+=2; $$.traduccion += $1.insertTabsInText(tabs) + $1.traduccion + $2; tabs -= 2;}
+         | PRINTS {$$ = new Nodo('SENTENCE'); $$.addChildrens($1);tabs+=2; $$.traduccion += $1.insertTabsInText(tabs) + $1.traduccion; tabs -= 2;}
+         | IFS {$$ = new Nodo('SENTENCE'); $$.addChildrens($1); tabs+=2; $$.traduccion += $1.insertTabsInText(tabs) + $1.traduccion; tabs -= 2;}
+         | FOR {$$ = new Nodo('SENTENCE'); $$.addChildrens($1); tabs+=2; $$.traduccion += $1.insertTabsInText(tabs) + $1.traduccion; tabs -= 2;}
+         | WHILE {$$ = new Nodo('SENTENCE'); $$.addChildrens($1); tabs+=2; $$.traduccion += $1.insertTabsInText(tabs) +  $1.traduccion; tabs -= 2;}
+         | DOWHILE  {$$ = new Nodo('SENTENCE'); $$.addChildrens($1); tabs+=2; $$.traduccion += $1.insertTabsInText(tabs) + $1.traduccion; tabs -= 2;}
+         | RETURN  {$$ = new Nodo('SENTENCE'); $$.addChildrens($1); tabs+=2; $$.traduccion += $1.insertTabsInText(tabs) + $1.traduccion; tabs -= 2;}
+         | BREAK   {$$ = new Nodo('SENTENCE'); $$.addChildrens($1); tabs+=2; $$.traduccion += $1.insertTabsInText(tabs) +  $1.traduccion; tabs -= 2;}
+         | CONTINUE  {$$ = new Nodo('SENTENCE'); $$.addChildrens($1); tabs+=2; $$.traduccion += $1.insertTabsInText(tabs) + $1.traduccion; tabs -= 2;}
          | error { errorList.push(new Error(idError, 'Syntactic error', this._$.first_line, this._$.first_column, yytext)); console.error('Syntactic error: ' + yytext  + ' in the line ' + this._$.first_line + ' and column ' + this._$.first_column); idError++; }
 ;
 
 
 
-DECLARATION : TYPE IDLIST ';' {$$ = new Nodo('DECLARATION'); $$.addChildrens($1); $$.addChildrens($2); $$.addChildrens(new Nodo($3));}
+DECLARATION : TYPE IDLIST ';' {$$ = new Nodo('DECLARATION'); $$.addChildrens($1); $$.addChildrens($2); $$.addChildrens(new Nodo($3));
+                               $$.traduccion += $1.traduccion + $2.traduccion + $3 + "\n";}
            ;
-IDLIST : IDLIST ',' ID {$$ = new Nodo('IDLIST'); $$.addChildrens($1); $$.addChildrens(new Nodo($2)); $$.addChildrens($3);}
-       | ID {$$ = new Nodo('IDLIST'); $$.addChildrens($1);}
+IDLIST : IDLIST ',' ID {$$ = new Nodo('IDLIST'); $$.addChildrens($1); $$.addChildrens(new Nodo($2)); $$.addChildrens($3);
+                        $$.traduccion += $1.traduccion + $2 + $3.traduccion;}
+       | ID {$$ = new Nodo('IDLIST'); $$.addChildrens($1); $$.traduccion += $1.traduccion;}
 ;
-ID : 'identifier' {$$ = new Nodo('ID'); $$.addChildrens(new Nodo($1));}
-   | 'identifier' ASSIGMENTEXPRESSION {$$ = new Nodo('ID'); $$.addChildrens(new Nodo($1)); $$.addChildrens($2);}
+ID : 'identifier' {$$ = new Nodo('ID'); $$.addChildrens(new Nodo($1)); $$.traduccion += $1;}
+
+   | 'identifier' ASSIGMENTEXPRESSION {$$ = new Nodo('ID'); $$.addChildrens(new Nodo($1)); $$.addChildrens($2);
+                                       $$.traduccion += $1 + " " + $2.traduccion}
 ;
 
-ASSIGMENT : 'identifier' ASSIGMENTEXPRESSION ';' {$$ = new Nodo('ASSIGMENT'); $$.addChildrens(new Nodo($1)); $$.addChildrens($2); $$.addChildrens(new Nodo($3)); }
-          | 'identifier' '++' ';' {$$ = new Nodo('ASSIGMENT'); $$.addChildrens(new Nodo($1)); $$.addChildrens(new Nodo($2)); $$.addChildrens(new nodo($3));}
-          | 'identifier' '--' ';' {$$ = new Nodo('ASSIGMENT'); $$.addChildrens(new Nodo($1)); $$.addChildrens(new Nodo($2)); $$.addChildrens(new nodo($3));}
+ASSIGMENT : 'identifier' ASSIGMENTEXPRESSION ';' {$$ = new Nodo('ASSIGMENT'); $$.addChildrens(new Nodo($1)); $$.addChildrens($2);
+                                                  $$.addChildrens(new Nodo($3));
+                                                  $$.traduccion += $1 + " " + $2.traduccion + $3 + "\n";}
+
+          | 'identifier' '++' ';' {$$ = new Nodo('ASSIGMENT'); $$.addChildrens(new Nodo($1)); $$.addChildrens(new Nodo($2)); 
+                                  $$.addChildrens(new Nodo($3));
+                                  $$.traduccion += $1 + $2 + $3 + "\n";}
+
+          | 'identifier' '--' ';' {$$ = new Nodo('ASSIGMENT'); $$.addChildrens(new Nodo($1)); $$.addChildrens(new Nodo($2));
+                                   $$.addChildrens(new Nodo($3));
+                                   $$.traduccion += $1 + $2 + $3 + "\n";}
 ;
 
-ASSIGMENTEXPRESSION : '=' EXPRESSION {$$ = new Nodo('ASSIGMENTEXPRESSION'); $$.addChildrens(new Nodo($1)); $$.addChildrens($2);}
+ASSIGMENTEXPRESSION : '=' EXPRESSION {$$ = new Nodo('ASSIGMENTEXPRESSION'); $$.addChildrens(new Nodo($1)); $$.addChildrens($2);
+                                      $$.traduccion += $1 + " "  + $2.traduccion;}
+
+                    | '+=' EXPRESSION {$$ = new Nodo('ASSIGMENTEXPRESSION'); $$.addChildrens(new Nodo($1)); $$.addChildrens($2);
+                                       $$.traduccion += $1 + " " + $2.traduccion;}
+
+                    | '-=' EXPRESSION {$$ = new Nodo('ASSIGMENTEXPRESSION'); $$.addChildrens(new Nodo($1)); $$.addChildrens($2);
+                                       $$.traduccion += $1 + " " + $2.traduccion;}
 ;
 
-EXPRESSION : EXPRESSION '+' EXPRESSION  {$$ = new Nodo('EXPRESSION'); $$.addChildrens($1); $$.addChildrens(new Nodo($2)); $$.addChildrens($3);}
-           | EXPRESSION '-' EXPRESSION {$$ = new Nodo('EXPRESSION'); $$.addChildrens($1); $$.addChildrens(new Nodo($2)); $$.addChildrens($3);}
-           | EXPRESSION '*' EXPRESSION {$$ = new Nodo('EXPRESSION'); $$.addChildrens($1); $$.addChildrens(new Nodo($2)); $$.addChildrens($3);}
-           | EXPRESSION '/' EXPRESSION {$$ = new Nodo('EXPRESSION'); $$.addChildrens($1); $$.addChildrens(new Nodo($2)); $$.addChildrens($3);}
-           | EXPRESSION '^' EXPRESSION {$$ = new Nodo('EXPRESSION'); $$.addChildrens($1); $$.addChildrens(new Nodo($2)); $$.addChildrens($3);}
-           | EXPRESSION '%' EXPRESSION {$$ = new Nodo('EXPRESSION'); $$.addChildrens($1); $$.addChildrens(new Nodo($2)); $$.addChildrens($3);}
-           | EXPRESSION '<' EXPRESSION {$$ = new Nodo('EXPRESSION'); $$.addChildrens($1); $$.addChildrens(new Nodo($2)); $$.addChildrens($3);}
-           | EXPRESSION '>' EXPRESSION {$$ = new Nodo('EXPRESSION'); $$.addChildrens($1); $$.addChildrens(new Nodo($2)); $$.addChildrens($3);}
-           | EXPRESSION '<=' EXPRESSION {$$ = new Nodo('EXPRESSION'); $$.addChildrens($1); $$.addChildrens(new Nodo($2)); $$.addChildrens($3);}
-           | EXPRESSION '>=' EXPRESSION {$$ = new Nodo('EXPRESSION'); $$.addChildrens($1); $$.addChildrens(new Nodo($2)); $$.addChildrens($3);}
-           | EXPRESSION '==' EXPRESSION {$$ = new Nodo('EXPRESSION'); $$.addChildrens($1); $$.addChildrens(new Nodo($2)); $$.addChildrens($3);}
-           | EXPRESSION '!=' EXPRESSION {$$ = new Nodo('EXPRESSION'); $$.addChildrens($1); $$.addChildrens(new Nodo($2)); $$.addChildrens($3);}
-           | EXPRESSION '||' EXPRESSION {$$ = new Nodo('EXPRESSION'); $$.addChildrens($1); $$.addChildrens(new Nodo($2)); $$.addChildrens($3);}
-           | EXPRESSION '&&' EXPRESSION {$$ = new Nodo('EXPRESSION'); $$.addChildrens($1); $$.addChildrens(new Nodo($2)); $$.addChildrens($3);}
-           | '(' EXPRESSION ')' {$$ = new Nodo('EXPRESSION'); $$.addChildrens(new Nodo($1)); $$.addChildrens($2); $$.addChildrens(new Nodo($3));}
-           | '-' EXPRESSION %prec UMINUS {$$ = new Nodo('EXPRESSION'); $$.addChildrens(new Nodo($1)); $$.addChildrens($2);}
-           | '!' EXPRESSION {$$ = new Nodo('EXPRESSION'); $$.addChildrens(new Nodo($1)); $$.addChildrens($2);}
-           | 'identifier'{$$ = new Nodo('EXPRESSION'); $$.addChildrens(new Nodo($1));}
-           | 'stringContent' {$$ = new Nodo('EXPRESSION'); $$.addChildrens(new Nodo($1));}
-           | 'character' {$$ = new Nodo('EXPRESSION'); $$.addChildrens(new Nodo($1));}
-           | 'decimal' {$$ = new Nodo('EXPRESSION'); $$.addChildrens(new Nodo($1));}
-           | 'true'  {$$ = new Nodo('EXPRESSION'); $$.addChildrens(new Nodo($1));}
-           | 'false' {$$ = new Nodo('EXPRESSION'); $$.addChildrens(new Nodo($1));}
-           | CALLMETHOD {$$ = new Nodo('EXPRESSION'); $$.addChildrens($1);}
+EXPRESSION : EXPRESSION '+' EXPRESSION  {$$ = new Nodo('EXPRESSION'); $$.addChildrens($1);
+                                         $$.addChildrens(new Nodo($2)); $$.addChildrens($3);
+                                         $$.traduccion += $1.traduccion + " " + $2 + " " + $3.traduccion;}
+
+           | EXPRESSION '-' EXPRESSION {$$ = new Nodo('EXPRESSION'); $$.addChildrens($1);
+                                        $$.addChildrens(new Nodo($2)); $$.addChildrens($3);
+                                        $$.traduccion += $1.traduccion + " " + $2 + " " + $3.traduccion;}
+
+           | EXPRESSION '*' EXPRESSION {$$ = new Nodo('EXPRESSION'); $$.addChildrens($1); 
+                                        $$.addChildrens(new Nodo($2)); $$.addChildrens($3);
+                                        $$.traduccion += $1.traduccion + " " + $2 + " " + $3.traduccion;}
+
+           | EXPRESSION '/' EXPRESSION {$$ = new Nodo('EXPRESSION'); $$.addChildrens($1);
+                                        $$.addChildrens(new Nodo($2)); $$.addChildrens($3);
+                                        $$.traduccion += $1.traduccion + " " + $2 + " " + $3.traduccion;}
+
+           | EXPRESSION '^' EXPRESSION {$$ = new Nodo('EXPRESSION'); $$.addChildrens($1);
+                                        $$.addChildrens(new Nodo($2)); $$.addChildrens($3);
+                                        $$.traduccion += $1.traduccion + " " + $2 + " " + $3.traduccion;}
+
+           | EXPRESSION '%' EXPRESSION {$$ = new Nodo('EXPRESSION'); $$.addChildrens($1);
+                                        $$.addChildrens(new Nodo($2)); $$.addChildrens($3);
+                                        $$.traduccion += $1.traduccion + " " + $2 + " " + $3.traduccion;}
+
+           | EXPRESSION '<' EXPRESSION {$$ = new Nodo('EXPRESSION'); $$.addChildrens($1);
+                                        $$.addChildrens(new Nodo($2)); $$.addChildrens($3);
+                                        $$.traduccion += $1.traduccion + " " + $2 + " " + $3.traduccion;}
+
+           | EXPRESSION '>' EXPRESSION {$$ = new Nodo('EXPRESSION'); $$.addChildrens($1);
+                                        $$.addChildrens(new Nodo($2)); $$.addChildrens($3);
+                                        $$.traduccion += $1.traduccion + " " + $2 + " " + $3.traduccion;}
+
+           | EXPRESSION '<=' EXPRESSION {$$ = new Nodo('EXPRESSION'); $$.addChildrens($1);
+                                         $$.addChildrens(new Nodo($2)); $$.addChildrens($3);
+                                         $$.traduccion += $1.traduccion + " " + $2 + " " + $3.traduccion;}
+
+           | EXPRESSION '>=' EXPRESSION {$$ = new Nodo('EXPRESSION'); $$.addChildrens($1);
+                                         $$.addChildrens(new Nodo($2)); $$.addChildrens($3);
+                                         $$.traduccion += $1.traduccion + " " + $2 + " " + $3.traduccion;}
+
+           | EXPRESSION '==' EXPRESSION {$$ = new Nodo('EXPRESSION'); $$.addChildrens($1);
+                                         $$.addChildrens(new Nodo($2)); $$.addChildrens($3);
+                                         $$.traduccion += $1.traduccion + " " + $2 + " " + $3.traduccion;}
+
+           | EXPRESSION '!=' EXPRESSION {$$ = new Nodo('EXPRESSION'); $$.addChildrens($1);
+                                         $$.addChildrens(new Nodo($2)); $$.addChildrens($3);
+                                         $$.traduccion += $1.traduccion + " " + $2 + " " + $3.traduccion;}
+
+           | EXPRESSION '||' EXPRESSION {$$ = new Nodo('EXPRESSION'); $$.addChildrens($1);
+                                         $$.addChildrens(new Nodo($2)); $$.addChildrens($3);
+                                         $$.traduccion += $1.traduccion + " " + $2 + " " + $3.traduccion;}
+
+           | EXPRESSION '&&' EXPRESSION {$$ = new Nodo('EXPRESSION'); $$.addChildrens($1);
+                                         $$.addChildrens(new Nodo($2)); $$.addChildrens($3);
+                                         $$.traduccion += $1.traduccion + " " + $2 + " " + $3.traduccion;}
+
+           | '(' EXPRESSION ')' {$$ = new Nodo('EXPRESSION'); $$.addChildrens(new Nodo($1));
+                                 $$.addChildrens($2); $$.addChildrens(new Nodo($3));
+                                 $$.traduccion += $1 + $2.traduccion + $3;}
+
+           | '-' EXPRESSION %prec UMINUS {$$ = new Nodo('EXPRESSION'); $$.addChildrens(new Nodo($1)); $$.addChildrens($2);
+                                          $$.traduccion += $1 + $2.traduccion;}
+           | '!' EXPRESSION {$$ = new Nodo('EXPRESSION'); $$.addChildrens(new Nodo($1)); $$.addChildrens($2);
+                             $$.traduccion += $1 + $2.traduccion; }
+
+           | 'identifier'{$$ = new Nodo('EXPRESSION'); $$.addChildrens(new Nodo($1));
+                          $$.traduccion += $1;}
+
+           | 'stringContent' {$$ = new Nodo('EXPRESSION'); $$.addChildrens(new Nodo($1)); $$.traduccion +=  '"' + $1 + '"';}
+           | 'character' {$$ = new Nodo('EXPRESSION'); $$.addChildrens(new Nodo($1)); $$.traduccion += "'" + $1 + "'";}
+           | 'decimal' {$$ = new Nodo('EXPRESSION'); $$.addChildrens(new Nodo($1)); $$.traduccion += $1;}
+           | 'true'  {$$ = new Nodo('EXPRESSION'); $$.addChildrens(new Nodo($1)); $$.traduccion += $1;}
+           | 'false' {$$ = new Nodo('EXPRESSION'); $$.addChildrens(new Nodo($1)); $$.traduccion += $1;}
+           | CALLMETHOD {$$ = new Nodo('EXPRESSION'); $$.addChildrens($1); $$.traduccion += $1.traduccion;}
 ;
 
-CALLMETHOD : 'identifier' '(' ')'  {$$ = new Nodo('CALLMETHOD'); $$.addChildrens(new Nodo($1)); $$.addChildrens(new Nodo($2)); $$.addChildrens(new Nodo($3)); }
-          | 'identifier' '(' CALLPARAMS ')' {$$ = new Nodo('CALLMETHOD'); $$.addChildrens(new Nodo($1)); $$.addChildrens(new Nodo($2)); $$.addChildrens($3); $$.addChildrens(new Nodo($4));}
+CALLMETHOD : 'identifier' '(' ')'  {$$ = new Nodo('CALLMETHOD'); $$.addChildrens(new Nodo($1));
+                                    $$.addChildrens(new Nodo($2)); $$.addChildrens(new Nodo($3));
+                                    $$.traduccion += $1 + $2 + $3;}
+
+          | 'identifier' '(' CALLPARAMS ')' {$$ = new Nodo('CALLMETHOD'); $$.addChildrens(new Nodo($1));
+                                             $$.addChildrens(new Nodo($2)); $$.addChildrens($3); $$.addChildrens(new Nodo($4));
+                                             $$.traduccion += $1 + $2 + $3.traduccion + $4;}
 ;
 
-CALLPARAMS : CALLPARAMS ',' EXPRESSION {$$ = new Nodo('CALLPARAMS'); $$.addChildrens($1); $$.addChildrens(new Nodo($2)); $$.addChildrens($2);}
-          | EXPRESSION {$$ = new Nodo('CALLPARAMS'); $$.addChildrens($1);}
+CALLPARAMS : CALLPARAMS ',' EXPRESSION {$$ = new Nodo('CALLPARAMS'); $$.addChildrens($1); 
+                                        $$.addChildrens(new Nodo($2)); $$.addChildrens($3);
+                                        $$.traduccion += $1.traduccion + $2 + $3.traduccion;}
+
+          | EXPRESSION {$$ = new Nodo('CALLPARAMS'); $$.addChildrens($1); $$.traduccion += $1.traduccion;}
 ;
 
-PRINTS : 'print' '(' ')' ';' {$$ = new Nodo('PRINTS'); $$.addChildrens(new Nodo($1)); $$.addChildrens(new Nodo($2)); $$.addChildrens(new Nodo($3)); $$.addChildrens(new Nodo($4));}
-       | 'println' '(' ')' ';' {$$ = new Nodo('PRINTS'); $$.addChildrens(new Nodo($1)); $$.addChildrens(new Nodo($2)); $$.addChildrens(new Nodo($3)); $$.addChildrens(new Nodo($4));}
-       | 'print' CONDITION ';' {$$ = new Nodo('PRINTS'); $$.addChildrens(new Nodo($1)); $$.addChildrens($2); $$.addChildrens(new Nodo($3));}
-       | 'println' CONDITION ';' {$$ = new Nodo('PRINTS'); $$.addChildrens(new Nodo($1)); $$.addChildrens($2); $$.addChildrens(new Nodo($3));}
+PRINTS : 'print' '(' ')' ';' {$$ = new Nodo('PRINTS'); $$.addChildrens(new Nodo($1)); $$.addChildrens(new Nodo($2));
+                              $$.addChildrens(new Nodo($3)); $$.addChildrens(new Nodo($4));
+                              $$.traduccion += "console.log" + $2 + $3 + $4;}
+
+       | 'println' '(' ')' ';' {$$ = new Nodo('PRINTS'); $$.addChildrens(new Nodo($1)); $$.addChildrens(new Nodo($2));
+                                $$.addChildrens(new Nodo($3)); $$.addChildrens(new Nodo($4));
+                                $$.traduccion += "console.log" + $2 + $3 + $4;}
+
+       | 'print' CONDITION ';' {$$ = new Nodo('PRINTS'); $$.addChildrens(new Nodo($1));
+                                $$.addChildrens($2); $$.addChildrens(new Nodo($3));
+                                $$.traduccion += "console.log" + $2.traduccion + $3;}
+
+       | 'println' CONDITION ';' {$$ = new Nodo('PRINTS'); $$.addChildrens(new Nodo($1));
+                                  $$.addChildrens($2); $$.addChildrens(new Nodo($3));
+                                  $$.traduccion += "console.log" + $2.traduccion + $3;}
 ;
 
-CONDITION : '(' EXPRESSION ')' {$$ = new Nodo('CONDITION'); $$.addChildrens(new Nodo($1)); $$.addChildrens($2); $$.addChildrens(new Nodo($3));}
+CONDITION : '(' EXPRESSION ')' {$$ = new Nodo('CONDITION'); $$.addChildrens(new Nodo($1));
+                                $$.addChildrens($2); $$.addChildrens(new Nodo($3));
+                                $$.traduccion += $1 + $2.traduccion + $3;}
+
         | error  { errorList.push(new Error(idError, 'Syntactic error', this._$.first_line, this._$.first_column, yytext)); console.error('Syntactic error: ' + yytext  + ' in the line ' + this._$.first_line + ' and column ' + this._$.first_column); idError++; }
 ;
 
-IFS :  'if' CONDITION BODY  {$$ = new Nodo('IFS'); $$.addChildrens(new Nodo($1)); $$.addChildrens($2); $$.addChildrens($3);}
-    |  'if' CONDITION BODY 'else' IFS  {$$ = new Nodo('IFS'); $$.addChildrens(new Nodo($1)); $$.addChildrens($2); $$.addChildrens($3); $$.addChildrens(new Nodo($4)); $$.addChildrens($5);}
-    |  'if' CONDITION BODY 'else' BODY {$$ = new Nodo('IFS'); $$.addChildrens(new Nodo($1)); $$.addChildrens($2); $$.addChildrens($3); $$.addChildrens(new Nodo($4)); $$.addChildrens($5);}
+IFS :  'if' CONDITION BODY  {$$ = new Nodo('IFS'); $$.addChildrens(new Nodo($1));
+                            $$.addChildrens($2); $$.addChildrens($3);
+                            counterIF++; auxName = $1; $$.traduccion += $1 + $2.traduccion + $3.traduccion;}
+    |  'if' CONDITION BODY 'else' IFS  {$$ = new Nodo('IFS'); $$.addChildrens(new Nodo($1)); $$.addChildrens($2);
+                                        $$.addChildrens($3); $$.addChildrens(new Nodo($4)); $$.addChildrens($5);
+                                        $$.traduccion += $1 + $2.traduccion + $3.traduccion + $4 + " " + $5.traduccion;}
+    |  'if' CONDITION BODY 'else' BODY {$$ = new Nodo('IFS'); $$.addChildrens(new Nodo($1)); $$.addChildrens($2); 
+                                        $$.addChildrens($3); $$.addChildrens(new Nodo($4)); $$.addChildrens($5);
+                                        $$.traduccion += $1 + $2.traduccion + $3.traduccion + $4 + " "+ $5.traduccion;}
 ;
 
-FOR : 'for' '(' TYPE 'identifier' ASSIGMENTEXPRESSION ';' EXPRESSION ';' ITERATOR ')' BODY {$$ = new Nodo('FOR'); $$.addChildrens(new Nodo($1)); $$.addChildrens(new Nodo($2)); $$.addChildrens($3); $$.addChildrens(new Nodo($4)); $$.addChildrens($5); $$.addChildrens(new Nodo($6)); $$.addChildrens($7); $$.addChildrens(new Nodo($8)); $$.addChildrens($9); $$.addChildrens(new Nodo($10)); $$.addChildrens($11); }
-    | 'for' '(' 'identifier' ASSIGMENTEXPRESSION ';' EXPRESSION ';' ITERATOR ')' BODY {$$ = new Nodo('FOR'); $$.addChildrens(new Nodo($1)); $$.addChildrens(new Nodo($2)); $$.addChildrens(new Nodo($3)); $$.addChildrens($4); $$.addChildrens(new Nodo($5)); $$.addChildrens($6); $$.addChildrens(new Nodo($7)); $$.addChildrens($8); $$.addChildrens(new Nodo($9)); $$.addChildrens($10); }
+FOR : 'for' '(' TYPE 'identifier' ASSIGMENTEXPRESSION ';' EXPRESSION ';' ITERATOR ')' BODY {$$ = new Nodo('FOR'); $$.addChildrens(new Nodo($1));
+                                                                                            $$.addChildrens(new Nodo($2)); $$.addChildrens($3); 
+                                                                                            $$.addChildrens(new Nodo($4)); $$.addChildrens($5); 
+                                                                                            $$.addChildrens(new Nodo($6)); $$.addChildrens($7); 
+                                                                                            $$.addChildrens(new Nodo($8)); $$.addChildrens($9); 
+                                                                                            $$.addChildrens(new Nodo($10)); $$.addChildrens($11);
+                                                                                            $$.traduccion += $1 + " " + $2 + $3.traduccion + " " + $4
+                                                                                             + $5.traduccion + " " + $6 + $7.traduccion + $8 +  $9.traduccion +
+                                                                                             $10 + " " + $11.traduccion; }
+
+    | 'for' '(' 'identifier' ASSIGMENTEXPRESSION ';' EXPRESSION ';' ITERATOR ')' BODY {$$ = new Nodo('FOR'); $$.addChildrens(new Nodo($1)); $$.addChildrens(new Nodo($2)); 
+                                                                                       $$.addChildrens(new Nodo($3)); $$.addChildrens($4); $$.addChildrens(new Nodo($5));
+                                                                                       $$.addChildrens($6); $$.addChildrens(new Nodo($7)); $$.addChildrens($8);
+                                                                                       $$.addChildrens(new Nodo($9)); $$.addChildrens($10);
+                                                                                       $$.traduccion += $1 + " " + $2 + $3 + " " + $4.traduccion + $5 + " " + $6.traduccion +
+                                                                                       $7 + " " + $8.traduccion + " " + $9 + " " + $10.traduccion; }
+
     | 'for' error  { errorList.push(new Error(idError, 'Syntactic error', this._$.first_line, this._$.first_column, yytext)); console.error('Syntactic error: ' + yytext  + ' in the line ' + this._$.first_line + ' and column ' + this._$.first_column); idError++; }
 ;
 
-ITERATOR : 'identifier' '++' {$$ = new Nodo('ITERATOR'); $$.addChildrens(new Nodo($1)); $$.addChildrens(new Nodo($2));}
-         | 'identifier' '--' {$$ = new Nodo('ITERATOR'); $$.addChildrens(new Nodo($1)); $$.addChildrens(new Nodo($2));}
+ITERATOR : 'identifier' '++' {$$ = new Nodo('ITERATOR'); $$.addChildrens(new Nodo($1));
+                              $$.addChildrens(new Nodo($2));
+                              $$.traduccion += $1 + $2;}
+         | 'identifier' '--' {$$ = new Nodo('ITERATOR'); $$.addChildrens(new Nodo($1));
+                              $$.addChildrens(new Nodo($2));
+                              $$.traduccion += $1 + $2;}
 ;
 
-WHILE : 'while' CONDITION BODY {$$ = new Nodo('WHILE'); $$.addChildrens(new Nodo($1)); $$.addChildrens($2); $$.addChildrens($3);}
+WHILE : 'while' CONDITION BODY {$$ = new Nodo('WHILE'); $$.addChildrens(new Nodo($1));
+                                $$.addChildrens($2); $$.addChildrens($3);
+                                $$.traduccion += $1 + " " + $2.traduccion + " " + $3.traduccion;}
 ;
 
-DOWHILE : 'do' BODY 'while' CONDITION ';' {$$ = new Nodo('DOWHILE'); $$.addChildrens(new Nodo($1)); $$.addChildrens($2); $$.addChildrens(new Nodo($3)); $$.addChildrens($4); $$.addChildrens(new Nodo($5));}
+DOWHILE : 'do' BODY 'while' CONDITION ';' {$$ = new Nodo('DOWHILE'); $$.addChildrens(new Nodo($1)); $$.addChildrens($2);
+                                           $$.addChildrens(new Nodo($3)); $$.addChildrens($4); $$.addChildrens(new Nodo($5));
+                                           $$.traduccion += $1 + " " + $2.traduccion + " " + $3 + " " + $4.traduccion + $5;}
 ;
 
-RETURN : 'return' ';' {$$ = new Nodo('RETURN'); $$.addChildrens(new Nodo($1)); $$.addChildrens(new Nodo($2));}
-       | 'return' EXPRESSION ';' {$$ = new Nodo('RETURN'); $$.addChildrens(new Nodo($1)); $$.addChildrens($2); $$.addChildrens(new Nodo($3));}
+RETURN : 'return' ';' {$$ = new Nodo('RETURN'); $$.addChildrens(new Nodo($1));
+                       $$.addChildrens(new Nodo($2)); $$.traduccion += $1 + $2;}
+
+       | 'return' EXPRESSION ';' {$$ = new Nodo('RETURN'); $$.addChildrens(new Nodo($1));
+                                  $$.addChildrens($2); $$.addChildrens(new Nodo($3));
+                                  $$.traduccion += $1 + " " + $2.traduccion + $3;}
 ;
 
-BREAK : 'break' ';' {$$ = new Nodo('BREAK'); $$.addChildrens(new Nodo($1)); $$.addChildrens(new Nodo($2));}
+BREAK : 'break' ';' {$$ = new Nodo('BREAK'); $$.addChildrens(new Nodo($1));
+                     $$.addChildrens(new Nodo($2));
+                     $$.traduccion += $1 + $2;}
 ;
 
-CONTINUE : 'continue' ';' {$$ = new Nodo('CONTINUE'); $$.addChildrens(new Nodo($1)); $$.addChildrens(new Nodo($2));}
+CONTINUE : 'continue' ';' {$$ = new Nodo('CONTINUE'); $$.addChildrens(new Nodo($1));
+                           $$.addChildrens(new Nodo($2)); $$.traduccion += $1 + $2;}
 ;
 ERROR : '{'
       | '}' 

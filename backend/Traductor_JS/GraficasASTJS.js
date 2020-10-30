@@ -6,7 +6,7 @@ class GraficasASTJS {
     }
 
     generateString(raiz) {
-        this.cadena.append("digraph D{\n\t node[shape=circle fillcolor=green style=filled];\n\t\t");
+        this.cadena.append("digraph D{\n\t node[shape=ellipse fillcolor=green style=filled];\n\t\t");
         this.getNodos(raiz, this.cadena);
         this.setRelation(raiz, this.cadena);
         this.cadena += "}";

@@ -5,6 +5,7 @@ class Nodo {
         this.id = 0;
         this.Value = Value;
         this.childrens = new LinkedList();
+        this.traduccion = "";
     }
 
     get getID() {
@@ -22,7 +23,15 @@ class Nodo {
     get getChildrens() {
         return this.childrens;
     }
-
+    
+    insertTabsInText(n) {
+        let text = "";
+        for (let index = 0; index < n; index++) {
+            text += "    "
+        }
+        return text
+    }
+   
     setID(ID) {
         this.id = ID;
     }
