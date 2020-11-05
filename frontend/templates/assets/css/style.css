@@ -1,0 +1,115 @@
+body {
+    background-color: #21222C;
+}
+
+.bg-dark {
+    background-color: #191A21 !important;
+}
+
+.navbar .dropdown-menu {
+    background-color: #21222C;
+    color: #fff;
+    cursor: pointer;
+}
+
+.dropdown-item:focus,
+.dropdown-item:hover {
+    color: #21222C;
+    text-decoration: none;
+    background-color: #f8f9fa;
+}
+
+.dropdown-menu a:hover {
+    color: #21222C !important;
+    cursor: pointer;
+}
+
+.dropdown-item.active,
+.dropdown-item:active {
+    color: #fff;
+    text-decoration: none;
+    background-color: #fdfdfe;
+}
+
+.dropdown-item {
+    color: white;
+}
+
+.upload-btn-wrapper {
+    position: relative;
+    overflow: hidden;
+    display: inline-block;
+}
+
+.upload-btn-wrapper input[type=file] {
+    position: absolute;
+    left: 0;
+    top: 0;
+    opacity: 0;
+    cursor: pointer;
+}
+
+.customTab {
+    height: 4vh !important;
+}
+
+.custom-navLink,
+.custom-navLink {
+    text-decoration: none;
+    color: #fff !important;
+}
+
+.custom-navLink :focus,
+.custom-navLink :hover {
+    text-decoration: none;
+    /*color: #f8f9fa !important;*/
+}
+
+.astPanel {
+    font-size: 13px !important;
+    height: 83vh !important;
+    width: 100%;
+    background-color: #282a36 !important;
+    color: #f8f8f2 !important;
+    border: none;
+    overflow: auto;
+}
+
+.CodeMirror {
+    font-size: 13px !important;
+    height: 83vh;
+}
+
+.CodeMirror-scrollbar-filler,
+.CodeMirror-gutter-filler {
+    background-color: #282a36;
+}
+
+.jstree-proton .jstree-hovered {
+    background: #282a36;
+}
+
+.jstree-proton .jstree-clicked {
+    background: #282a36;
+}
+
+/* SCROLLBAR CHROME */
+::-webkit-scrollbar {
+    width: 5px;
+    height: 5px;
+}
+
+::-webkit-scrollbar-track {
+    -webkit-border-radius: 3px;
+    border-radius: 3px;
+}
+
+::-webkit-scrollbar-thumb {
+    -webkit-border-radius: 3px;
+    border-radius: 3px;
+    background: #F8F8F2FF;
+}
+
+::-webkit-scrollbar-thumb:window-inactive {
+    background: #F8F8F2FF;
+}
