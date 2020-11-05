@@ -114,7 +114,7 @@ stringContent           ({stringType}((?:\\{stringType}|(?:(?!{stringType}).))*)
 %start START
 %% /* language grammar */
 
-START : ListsClass 'EOF'  { if (errorList.length > 0) { let eL = []; eL = eL.concat(errorList); errorList = []; idError = 0; return [eL]}else {$$ = new Nodo('Start'); $$.addChildrens($1); $$.traduccion += $1.traduccion; traduccion += $$.traduccion; console.log($$); idToken = 0;  return [$$,traduccion,listTokens];}   }    
+START : ListsClass 'EOF'  { if (errorList.length > 0) { let eL = []; eL = eL.concat(errorList); errorList = []; idError = 0; return [eL]}else {$$ = new Nodo('Start'); $$.addChildrens($1); $$.traduccion += $1.traduccion; traduccion += $$.traduccion; let auxTraduccion = traduccion; traduccion = ""; auxNodo = $$; $$ = new Nodo(""); idToken = 0;  return [auxNodo,auxTraduccion,listTokens];}   }    
       | 'EOF'
       | error  { errorList.push(new Error(idError, 'Syntactic error', this._$.first_line, this._$.first_column, yytext + "  " +' Was expected ' + yy.parser.hash.expected)); console.error('Syntactic error: ' + yytext + "  " +' Was expected ' + yy.parser.hash.expected + ' in the line ' + this._$.first_line + ' and column ' + this._$.first_column); idError++; }                
       ;

@@ -13,7 +13,7 @@
     <!-- CodeMirror -->
     <link rel="stylesheet" href="/templates/assets/codemirror/lib/codemirror.css">
     <link rel="stylesheet" href="/templates/assets/codemirror/theme/dracula.css">
-   
+
     <!-- Custom -->
     <link rel="stylesheet" href="/templates/assets/css/style.css">
     <title>Traductor JS/Python</title>
@@ -55,7 +55,7 @@
                     </a>
                     <div class="dropdown-menu" aria-labelledby="navbarReporte">
                         <a class="dropdown-item" id="errorReport">List of errors</a>
-                        <a class="dropdown-item" id="copyReport">Copy report</a>
+                        <a class="dropdown-item" id="traduccion">Download Traduccion</a>
                     </div>
                 </li>
             </ul>
@@ -73,6 +73,9 @@
                                 <a class="custom-navLink nav-link" href="#principalEditorTab"
                                     data-toggle="tab">Editor</a>
                             </li>
+                            <li class="nav-item">
+                                <a class="custom-navLink nav-link" href="#principalASTTab" data-toggle="tab">AST</a>
+                            </li>
                         </ul>
                     </div>
                 </nav>
@@ -80,6 +83,9 @@
                 <div class="tab-content">
                     <div class="tab-pane active" id="principalEditorTab">
                         <textarea class="tab-pane active" id="principalEditor"></textarea>
+                    </div>
+                    <div class="tab-pane" id="principalASTTab">
+                        <div class="astPanel" id="astDiv"></div>
                     </div>
                 </div>
             </div>
@@ -102,7 +108,7 @@
                     <div class="tab-pane active" id="secondaryEditorTab">
                         <textarea id="comparatorEditor"></textarea>
                     </div>
-                   
+
                 </div>
             </div>
         </div>
@@ -126,10 +132,12 @@
     <script type="application/javascript" src="/templates/assets/codemirror/mode/javascript/javascript.js"></script>
     <script type="application/javascript" src="/templates/assets/codemirror/addon/edit/closebrackets.js"></script>
 
-    
+    <script src="https://d3js.org/d3.v5.min.js"></script>
+    <script src="https://unpkg.com/viz.js@1.8.1/viz.js" type="javascript/worker"></script>
+    <script src="https://unpkg.com/d3-graphviz@2.1.0/build/d3-graphviz.min.js"></script>
 
     <script src="//ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
-    <script type="application/javascript" src="/templates/assets/js/index.js"></script>
+    <script type="application/javascript" src="/templates/assets/js/start.js"></script>
 </body>
 
 </html>

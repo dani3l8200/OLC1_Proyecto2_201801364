@@ -8,11 +8,11 @@ class ReportLexico {
     }
 
     updateList(){
-        for (let index = 0; index < this.tokens[2].toArray().length; index++) {
-            const element = this.tokens[2].toArray()[index];
+        for (let index = 0; index < this.tokens.toArray().length; index++) {
+            const element = this.tokens.toArray()[index];
             this.tokenList.append(new Token(element.getIdToken(),element.getType(),element.getLexem(), element.getRow(), element.getColumn()));
         }
-            
+        this.tokens.deleteAll();
         
     }
 

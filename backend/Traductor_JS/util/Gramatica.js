@@ -84,7 +84,7 @@ performAction: function anonymous(yytext, yyleng, yylineno, yy, yystate /* actio
 var $0 = $$.length - 1;
 switch (yystate) {
 case 1:
- if (errorList.length > 0) { let eL = []; eL = eL.concat(errorList); errorList = []; idError = 0; return [eL]}else {this.$ = new Nodo('Start'); this.$.addChildrens($$[$0-1]); this.$.traduccion += $$[$0-1].traduccion; traduccion += this.$.traduccion; console.log(this.$); idToken = 0;  return [this.$,traduccion,listTokens];}   
+ if (errorList.length > 0) { let eL = []; eL = eL.concat(errorList); errorList = []; idError = 0; return [eL]}else {this.$ = new Nodo('Start'); this.$.addChildrens($$[$0-1]); this.$.traduccion += $$[$0-1].traduccion; traduccion += this.$.traduccion; let auxTraduccion = traduccion; traduccion = ""; auxNodo = this.$; this.$ = new Nodo(""); idToken = 0;  return [auxNodo,auxTraduccion,listTokens];}   
 break;
 case 3: case 10: case 11: case 12: case 15: case 20: case 27: case 35: case 44: case 47: case 61: case 106: case 112:
  errorList.push(new Error(idError, 'Syntactic error', this._$.first_line, this._$.first_column, yytext + "  " +' Was expected ' + yy.parser.hash.expected)); console.error('Syntactic error: ' + yytext + "  " +' Was expected ' + yy.parser.hash.expected + ' in the line ' + this._$.first_line + ' and column ' + this._$.first_column); idError++; 

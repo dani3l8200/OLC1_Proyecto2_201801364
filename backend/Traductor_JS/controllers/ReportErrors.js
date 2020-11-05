@@ -9,8 +9,8 @@ class ReportErrors {
     }
 
     updateList(){
-        for (let index = 0; index < this.Errors[0].length; index++) {
-            const element = this.Errors[0][index];
+        for (let index = 0; index < this.Errors.length; index++) {
+            const element = this.Errors[index];
             this.errorList.append(new Error(element.getIdError(),element.getType(),element.getRow(), element.getColumn(),element.getDescription()));
         }
             
