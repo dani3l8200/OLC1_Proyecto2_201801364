@@ -1,7 +1,7 @@
-const Token = require('./Token')
-const LinkedList = require('../data_structure/LinkedList');
+const Token = require('../models/Token')
+const LinkedList = require('../controllers/LinkedList');
 const SyntacticAnalyzer = require('./SintacticoPY');
-const GraficasAST = require('./GraficarAST');
+const GraficasAST = require('../controllers/GraficarAST');
 
 
 
@@ -107,6 +107,10 @@ class AnalizadorLexico {
                         this.auxLex += letra;
                         this.column += 1;
                         this.state = 5;
+                    } else if (letra === "%") {
+                        this.auxLex += letra;
+                        this.column += 1;
+                        this.addTokens("TK_PORCENTAJE");
                     } else if (letra === "(") {
                         this.auxLex += letra;
                         this.column += 1;
@@ -310,6 +314,9 @@ class AnalizadorLexico {
                     if (letra === "+") {
                         this.auxLex += letra;
                         this.addTokens("TK_INCREMENTO");
+                    } else if (letra === "=") {
+                        this.auxLex += letra;
+                        this.addTokens("TK_CONCATENAR");
                     } else {
                         this.addTokens("TK_MAS");
                         index--;
@@ -319,6 +326,9 @@ class AnalizadorLexico {
                     if (letra === "-") {
                         this.auxLex += letra;
                         this.addTokens("TK_DECREMENTO");
+                    } else if (letra === "=") {
+                        this.auxLex += letra;
+                        this.addTokens("TK_DESCONCATENAR");
                     } else {
                         this.addTokens("TK_MENOS");
                         index--;
@@ -368,30 +378,172 @@ class AnalizadorLexico {
 
 module.exports = AnalizadorLexico;
 const test = new AnalizadorLexico();
-let cadena = `public class test {
-	public String prueba1(int x, int y, int z, String saludo){
-		saludo = "Prueba";
-		x = 10;
-		y = 30;
-		/*Una prueba de comentario multilinea
-		* 
-		*
-		*/
-		for(int i = 0; i < 20; i++){
-			if (saludo != "Hola"){
-				System.out.print(saludo);
-				do{
-					if(y == 30){
-					    System.out.print(y);
-					}
-					
-				}while(x < 20);
-			}else{
-				System.out.print("Saludo es hola");
-			}
-		}
-		return saludo;
-	}
+let cadena = `public class calificacion_1 {
+    public int fibonacci(int n) {
+      if ( n > 1 ){
+        return fibonacci( n - 1 ) + fibonacci( n - 2 );  //función recursiva
+      }
+      else if ( n == 1 ) {  // caso base
+        return 1;
+      }
+      else if ( n == 0 ){  // caso base
+        return 0;
+      }
+      else{ //error 
+        System.out.print((2%5));
+        return -1;
+      }
+    }
+
+    public int factorial_forma_1(int numero){
+        int factorial = 0;
+        while ( numero != 0 ) {
+          factorial = factorial * numero;
+          numero = numero - 1;
+        }
+        return factorial;
+      }
+
+      public int factorial_forma_2(double numero){
+        if ( numero == 0  && numero != 0) {
+          return 1;
+        }
+        else{
+          return numero * factorial_forma_2( numero - 1 );
+        }
+      }
+
+      public int factorial_forma_2(double numero){
+        if ( numero == 0 ) {
+          return 1;
+        }
+        else{
+          return numero * factorial_forma_2( numero - 1 );
+        }
+      }
+
+      public int ackerman(int m, int n) {
+        if (n < 0 || m < 0) {
+          return -1; // parametros no validos \n
+        }
+        if (m == 0) {
+          return n + 1;
+        }
+        if (n == 0) {
+          return ackerman(m - 1, 1);
+        }
+        return ackerman(m - 1, ackerman(m, n - 1));
+      }
+
+      public void Hanoi(int n, int origen,  int auxiliar, int destino){
+        if(n==1){
+          System.out.println("mover disco de " + origen + " a " + destino);
+        }else{
+          Hanoi(n-1, origen, destino, auxiliar);
+          System.out.println("mover disco de "+ origen + " a " + destino);
+          Hanoi(n-1, auxiliar, origen, destino);
+        }
+      }
+
+      public void main_1(String args) {
+        int a = 20;
+        int b = 10;
+        int c = 0;
+        int d, e, f = 30;
+        String x, y = "You";
+        // Operador + y -
+        System.out.println("a + b = " + (a + b) );
+        System.out.println("a - b = " + (a - b) );
+        // El operador + si se usa con strings
+        // concatena las cadenas dadas.
+        System.out.println("x + y = "+ x + y);
+        
+         // Operador * y /
+         System.out.println("a * b = " + (a * b) );
+         System.out.println("a / b = " + (a / b) );
+         // operador de módulo da el resto
+         // de dividir el primer operando con el segundo
+         System.out.println("a % b = " + (a % b) );
+         // si el denominador es 0 en la división
+         // System.out.println(a/c);
+         // lanzaría una java.lang.ArithmeticException
+         int a1, b1, c1, d1, e1, f2, g = 9;
+         // operador de asignación simple
+         c = b;
+         System.out.println("Valor de c = " + c);
+         a = a + 1;
+         b = b - 1;
+         e = e * 2;
+         f = f / 2;
+         System.out.println(
+           "Un texto concatenado es facil de "+
+           "identificar pues este contendra uno o varios "+
+           "simbolos (+) los cuales separan a los textos que "+
+           "se encuentran entre comillas dobles () como el"+
+           "ejemplo anterior."
+         );
+         a = a - 1;
+         b = b + 1;
+         e = e / 2;
+         f = f * 2;
+         return;
+        
+      }
+
+      public double relacionales(){
+        int arel, brel = 10;
+        String xrel, yrel = "Thank";
+        boolean condicion = true;
+        //varios operadores condicionales
+        System.out.println("a == b :" + (arel == brel));
+        System.out.println("a < b :" + (arel < brel));
+        System.out.println("a <= b :" + (arel <= brel));
+        System.out.println("a > b :" + (arel > brel));
+        System.out.println("a >= b :" + (arel >= brel));
+        System.out.println("a != b :" + (arel != brel));
+        System.out.println("condicion==true :" + (condicion == true));
+        return (brel / 4);
+      }
+
+      public String a_prueba(){
+        double /*-----comentario-------*/ xzy, asdf, pqrw = "string";
+        /*
+          int no_existe_1 = 0;
+          string no_existe_2 = "texto de cadena"
+          object obj = new Fantasma();
+        */
+      }
+      /*
+      Esta funcion valida la forma en la que una gramatica fue definida
+      si el estudiante no define esta parte en la gramatica debera tirar error
+      lo cual indica que falto esta validacion gramatical.
+      */
+
+     public boolean vacio(){}
+     public boolean enciclar_ejecucion(int infinito){
+       enciclar_ejecucion(infinito + 1);
+       return true || false || true || true && false || (23 >= 32);
+     }
+     public void numeroPar(int numero) {
+       System.out.println("Numero par menor que: " + numero);
+       int n;
+       do {
+           n = (Random() * numero);
+           System.out.println(n);
+       } while (n / 2 != 0);
+       System.out.println("Y el numero par elegido es: " + n);
+   }
+   public String concatenacion(String cad){
+       for(int integer = 0; integer >= 1000; i++) {
+         cad = cad + "<tr> <td> "+ integer +"</td> </tr>";
+       }
+       return cad;
+     }
+     public void main12(){
+       String cadena_principal = "El texto html debera concatenarse";
+       cadena_principal = concatena(cadena_principal);
+     }
+     
 }`;
 test.AnalisisLexico(cadena);
 test.ListTokens.print();

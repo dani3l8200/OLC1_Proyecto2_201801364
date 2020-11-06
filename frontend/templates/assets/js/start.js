@@ -4,6 +4,7 @@ var ast2Data = '';
 var consoleReports = '';
 var fileContent = '';
 var errorsList = '';
+var listaTokens = '';
 /* END -- Global variables */
 
 
@@ -90,7 +91,7 @@ function readFileContent(file) {
 function generateAST(dots) {
     $('#astDiv').html('');
     var graphviz = d3.select("#astDiv").graphviz()
-        .transition(function () {
+        .transition(function() {
             return d3.transition("main")
                 .ease(d3.easeLinear)
                 .delay(500)
@@ -113,24 +114,28 @@ function generateAST(dots) {
 
 
 /* Download files */
-document.getElementById('saveFile').onclick = function () {
+document.getElementById('saveFile').onclick = function() {
     var data = principalEditor.getDoc().getValue();
     writeContent(data, 'mainFile.java', 'text/java');
 }
 
-document.getElementById('saveFileCompare').onclick = function () {
+document.getElementById('saveFileCompare').onclick = function() {
     var data = comparatorEditor.getDoc().getValue();
     writeContent(data, 'comparedFile.java', 'text/java');
 }
 
-document.getElementById('errorReport').onclick = function () {
+document.getElementById('errorReport').onclick = function() {
     generateErrorReport(errorsList, 'ReportErrors');
 }
 
-document.getElementById('traduccion').onclick = function () {
+document.getElementById('traduccion').onclick = function() {
     writeContent(consoleReports, 'traduccion.js', 'text/js')
 }
-/* END -- Download files */
+
+document.getElementById('tokenReport').onclick = function() {
+        generateTokensReport(listaTokens, "ReportTokens");
+    }
+    /* END -- Download files */
 
 
 
@@ -232,7 +237,7 @@ function TraduccionJS(data) {
 /* Conection */
 function sendData() {
     var url = 'http://localhost:3000/TraductorJS';
-    
+
     consoleEditor.getDoc().setValue('');
 
     if (principalEditor.getDoc().getValue().length > 0) {
@@ -240,7 +245,7 @@ function sendData() {
             'mainFile': principalEditor.getDoc().getValue()
         }
 
-        $.post(url, files, function (res, status) {
+        $.post(url, files, function(res, status) {
             console.log(status);
             if (status.toString() == 'success') {
                 if (res.hasOwnProperty('errors')) {
@@ -251,12 +256,13 @@ function sendData() {
                 } else {
                     var dataJSON = res.data;
                     consoleReports = "";
+                    listaTokens = "";
                     var traduccion = dataJSON.Traduccion;
                     var stringAST = dataJSON.AstDot;
-                    console.log(stringAST);
+                    listaTokens = dataJSON.Tokens;
                     TraduccionJS(traduccion)
                     generateAST(stringAST);
-                    generateTokensReport(dataJSON.Tokens, 'ReportTokens')
+                    generateTokensReport(listaTokens, 'ReportTokens')
                     consoleEditor.getDoc().setValue(consoleReports);
 
                 }

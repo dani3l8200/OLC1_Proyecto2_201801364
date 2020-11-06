@@ -1,4 +1,4 @@
-const lista = require('../data_structure/LinkedList');
+const lista = require('./LinkedList');
 
 let LinkedList = new lista();
 class Translater {
@@ -10,8 +10,19 @@ class Translater {
         this.text += this.insertTabsInText(nTabs) + "class " + id + ":\n"
     }
 
-    DeclarationOrAssigVariable(name, value, nTabs) {
-        this.text += this.insertTabsInText(nTabs) + name + " = " + value + "\n";
+    DeclarationOrAssigVariable(name, value, nTabs, Type) {
+        if (Type === "TK_CONCATENAR") {
+            this.text += this.insertTabsInText(nTabs) + name + " += " + value + "\n";
+        } else if (Type === "TK_DESCONCATENAR") {
+            this.text += this.insertTabsInText(nTabs) + name + " -= " + value + "\n";
+        } else if (Type === "TK_DECREMENTO") {
+            this.text += this.insertTabsInText(nTabs) + name + " -= " + "1" + "\n";
+        } else if (Type === "TK_INCREMENTO") {
+            this.text += this.insertTabsInText(nTabs) + name + " += " + "1" + "\n";
+        } else if (Type === "TK_IGUAL") {
+            this.text += this.insertTabsInText(nTabs) + name + " = " + value + "\n";
+        }
+
     }
 
     CommentUAndM(content, type, nTabs) {
@@ -29,17 +40,32 @@ class Translater {
         }
     }
 
-    printWithContent(lista, nTabs) {
-        this.text += this.insertTabsInText(nTabs) + "print(";
+    printWithContent(lista, nTabs, Type) {
+        if (Type === "TK_PRINTLN") {
+            this.text += this.insertTabsInText(nTabs) + "print(";
 
-        for (let index = 0; index < lista.toArray().length; index++) {
-            this.text += lista.toArray()[index];
+            for (let index = 0; index < lista.toArray().length; index++) {
+                this.text += lista.toArray()[index];
+            }
+            this.text += ")\n";
+        } else if (Type === "TK_PRINT") {
+            this.text += this.insertTabsInText(nTabs) + "print(";
+
+            for (let index = 0; index < lista.toArray().length; index++) {
+                this.text += lista.toArray()[index];
+            }
+            this.text += ", end=\"\")\n";
         }
-        this.text += ")\n";
+
     }
 
-    printWithoutContent(nTabs) {
-        this.text += this.insertTabsInText(nTabs) + "print()\n";
+    printWithoutContent(nTabs, Type) {
+        if (Type === "TK_PRINT") {
+            this.text += this.insertTabsInText(nTabs) + "print(end=\"\")\n";
+        } else if (Type === "TK_PRINTLN") {
+            this.text += this.insertTabsInText(nTabs) + "print()\n";
+        }
+
     }
 
     IF(condition, nTabs) {
@@ -95,7 +121,7 @@ class Translater {
     }
 
     UtilitationFuntion(content, nTabs) {
-        this.text += this.insertTabsInText(nTabs) + content + "\n"
+        this.text += this.insertTabsInText(nTabs) + "self." + content + "\n"
     }
 }
 

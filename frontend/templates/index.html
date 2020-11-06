@@ -22,40 +22,38 @@
 <body>
     <nav class="navbar fixed-top navbar-dark py-0 bg-dark navbar-expand-lg py-md-0" style="height: 40px;">
         <label class="navbar-brand">Traductor JS/Python</label>
-        <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNav"
-            aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+        <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
             <span class="navbar-toggler-icon"></span>
         </button>
         <div class="collapse navbar-collapse" id="navbarNav">
             <ul class="navbar-nav">
                 <li class="nav-item dropdown">
-                    <a class="nav-link dropdown-toggle" href="" id="navbarFile" role="button" data-toggle="dropdown"
-                        aria-haspopup="true" aria-expanded="false">
+                    <a class="nav-link dropdown-toggle" href="" id="navbarFile" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
                         Archive
                     </a>
                     <div class="dropdown-menu" aria-labelledby="navbarFile">
                         <a class="dropdown-item upload-btn-wrapper">
-                            Open main file
+                            Open File Traductor JS
                             <input type="file" id="input-principalFile">
                         </a>
                         <a class="dropdown-item upload-btn-wrapper">
-                            Open file to compare
+                            Open file Traductor Python
                             <input type="file" id="input-secondaryFile">
                         </a>
                         <a class="dropdown-item" onclick="sendData()">Analyze</a>
                         <div class="dropdown-divider"></div>
-                        <a class="dropdown-item" id="saveFile">Save main file</a>
-                        <a class="dropdown-item" id="saveFileCompare">Save file to compare</a>
+                        <a class="dropdown-item" id="saveFile">Save Traductor JS file</a>
+                        <a class="dropdown-item" id="saveFileCompare">Save Traductos Python file</a>
                     </div>
                 </li>
                 <li class="nav-item dropdown">
-                    <a class="nav-link dropdown-toggle" href="" id="navbarReporte" role="button" data-toggle="dropdown"
-                        aria-haspopup="true" aria-expanded="false">
+                    <a class="nav-link dropdown-toggle" href="" id="navbarReporte" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
                         Reports
                     </a>
                     <div class="dropdown-menu" aria-labelledby="navbarReporte">
-                        <a class="dropdown-item" id="errorReport">List of errors</a>
+                        <a class="dropdown-item" id="errorReport">Download Errors Report</a>
                         <a class="dropdown-item" id="traduccion">Download Traduccion</a>
+                        <a class="dropdown-item" id="tokenReport">Download Tokens Report</a>
                     </div>
                 </li>
             </ul>
@@ -70,8 +68,7 @@
                     <div class="navbar-collapse collapse w-100 order-3 dual-collapse2">
                         <ul class="nav justify-content-center">
                             <li class="nav-item">
-                                <a class="custom-navLink nav-link" href="#principalEditorTab"
-                                    data-toggle="tab">Editor</a>
+                                <a class="custom-navLink nav-link" href="#principalEditorTab" data-toggle="tab">Editor</a>
                             </li>
                             <li class="nav-item">
                                 <a class="custom-navLink nav-link" href="#principalASTTab" data-toggle="tab">AST</a>
@@ -97,8 +94,7 @@
                     <div class="navbar-collapse collapse w-100 order-3 dual-collapse2">
                         <ul class="nav justify-content-center">
                             <li class="nav-item">
-                                <a class="custom-navLink nav-link" href="#secondaryEditorTab"
-                                    data-toggle="tab">Editor</a>
+                                <a class="custom-navLink nav-link" href="#secondaryEditorTab" data-toggle="tab">Editor</a>
                             </li>
                         </ul>
                     </div>
