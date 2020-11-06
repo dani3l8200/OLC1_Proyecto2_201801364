@@ -84,6 +84,11 @@ class Translater {
         this.text += "\n" + this.insertTabsInText(nTabs) + "def " + name + "(" + params + "):\n";
     }
 
+    IFunc(name, params, nTabs) {
+        this.text += "\n" + this.insertTabsInText(nTabs) + "def " + name + "(" + params + "):\n" + this.insertTabsInText(nTabs + 1) + "pass";
+    }
+
+
     SFor(id, start, end, nTabs) {
         this.text += this.insertTabsInText(nTabs) + "for " + id + ' in range(' + start + ", " + end + "):\n";
     }

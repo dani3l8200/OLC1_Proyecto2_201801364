@@ -160,14 +160,14 @@ class SyntacticAnalyzer {
 
             let tk3 = this.preanalisis.getLexema;
             this.Parea("TK_LLAVEA");
-
+            this.traductor.ClassOrInterfaz(tk2, this.tabs);
             let node1 = new Nodo("contentInterfaz");
             this.contentInterfaz(node1);
 
             let tk4 = this.preanalisis.getLexema;
             this.Parea("TK_LLAVEC");
 
-            this.traductor.ClassOrInterfaz(tk2, this.tabs);
+
 
             Node.addChilds(new Nodo(tk1));
             Node.addChilds(new Nodo(tk2));
@@ -1163,6 +1163,7 @@ class SyntacticAnalyzer {
 
 
     contentInterfaz(Node) {
+        this.tabs++;
         if (this.preanalisis.getType === "TK_PUBLIC") {
             let tk1 = this.preanalisis.getLexema;
             this.Parea("TK_PUBLIC");
@@ -1720,9 +1721,10 @@ class SyntacticAnalyzer {
         if (this.preanalisis.getType === "TK_INT" || this.preanalisis.getType === "TK_DOUBLE" || this.preanalisis.getType === "TK_STRING" ||
             this.preanalisis.getType === "TK_CHAR" || this.preanalisis.getType === "TK_BOOLEAN") {
             this.type = this.preanalisis.getLexema;
+            this.auxParams = "";
             let node1 = new Nodo("Type");
             this.Type(node1);
-            this.idsDeclaration.append(this.preanalisis.getLexema);
+            // this.idsDeclaration.append(this.preanalisis.getLexema);
             this.nameF = this.preanalisis.getLexema;
             let tk1 = this.preanalisis.getLexema;
             this.Parea("TK_ID");
@@ -1734,7 +1736,8 @@ class SyntacticAnalyzer {
             this.Parea("TK_PARENTESISC");
             let tk4 = this.preanalisis.getLexema;
             this.Parea("TK_PUNTOCOMA");
-
+            this.traductor.IFunc(this.nameF, this.auxParams, this.tabs);
+            this.tabs--;
             Node.addChilds(node1);
             Node.addChilds(new Nodo(tk1));
             Node.addChilds(new Nodo(tk2));
@@ -1743,8 +1746,9 @@ class SyntacticAnalyzer {
             Node.addChilds(new Nodo(tk4));
         } else if (this.preanalisis.getType === "TK_VOID") {
             let tk1 = this.preanalisis.getLexema;
+            this.auxParams = "";
             this.Parea("TK_VOID");
-            this.idsDeclaration.append(this.preanalisis.getLexema);
+            //this.idsDeclaration.append(this.preanalisis.getLexema);
             this.nameF = this.preanalisis.getLexema;
             let tk2 = this.preanalisis.getLexema;
             this.Parea("TK_ID");
@@ -1756,6 +1760,8 @@ class SyntacticAnalyzer {
             this.Parea("TK_PARENTESISC");
             let tk5 = this.preanalisis.getLexema;
             this.Parea("TK_PUNTOCOMA");
+            this.traductor.IFunc(this.nameF, this.auxParams, this.tabs);
+            this.tabs--;
             Node.addChilds(new Nodo(tk1));
             Node.addChilds(new Nodo(tk2));
             Node.addChilds(new Nodo(tk3));
