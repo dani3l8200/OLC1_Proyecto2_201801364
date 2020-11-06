@@ -7,7 +7,7 @@ class Translater {
     }
 
     ClassOrInterfaz(id, nTabs) {
-        this.text += this.insertTabsInText(nTabs) + "class " + id + ":\n"
+        this.text += this.insertTabsInText(nTabs) + "\nclass " + id + ":\n"
     }
 
     DeclarationOrAssigVariable(name, value, nTabs, Type) {
@@ -69,7 +69,7 @@ class Translater {
     }
 
     IF(condition, nTabs) {
-        this.text += this.insertTabsInText(nTabs) + condition + " :\n";
+        this.text += this.insertTabsInText(nTabs) + condition + ":\n";
     }
 
     BeginMain(nTabs) {
@@ -77,7 +77,7 @@ class Translater {
     }
 
     endMain(nTabs) {
-        this.text += this.insertTabsInText(nTabs) + 'if __name__ = "__main__":\n' + this.insertTabsInText(nTabs + 1) + "main()\n";
+        this.text += this.insertTabsInText(nTabs) + 'if __name__ == "__main__":\n' + this.insertTabsInText(nTabs + 1) + "main()\n\n";
     }
 
     MFunc(name, params, nTabs) {
@@ -85,7 +85,7 @@ class Translater {
     }
 
     IFunc(name, params, nTabs) {
-        this.text += "\n" + this.insertTabsInText(nTabs) + "def " + name + "(" + params + "):\n" + this.insertTabsInText(nTabs + 1) + "pass";
+        this.text += "\n" + this.insertTabsInText(nTabs) + "def " + name + "(" + params + "):\n" + this.insertTabsInText(nTabs + 1) + "pass\n\n";
     }
 
 

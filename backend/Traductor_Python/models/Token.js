@@ -1,9 +1,18 @@
 class Token {
-    constructor(lexem, type, column, row) {
+    constructor(idToken, lexem, type, column, row) {
+        this.idToken = idToken;
         this.lexem = lexem;
         this.type = type;
         this.column = column;
         this.row = row;
+    }
+
+    get getIDToken() {
+        return this.idToken;
+    }
+
+    set setIDToken(idToken) {
+        this.idToken = idToken;
     }
 
     get getLexema() {
@@ -39,7 +48,7 @@ class Token {
     }
 
     toString() {
-        return "Lexema: " + this.getLexema + "----Tipo: " + this.getType + "----Fila: " + this.getRow + "----Columna: " + this.getColumn;
+        return "ID: " + this.idToken + " Lexema: " + this.getLexema + "----Tipo: " + this.getType + "----Fila: " + this.getRow + "----Columna: " + this.getColumn;
     }
 };
 

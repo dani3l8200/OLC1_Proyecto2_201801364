@@ -40,7 +40,8 @@
                             Open file Traductor Python
                             <input type="file" id="input-secondaryFile">
                         </a>
-                        <a class="dropdown-item" onclick="sendData()">Analyze</a>
+                        <a class="dropdown-item" onclick="sendDataJS()">Analyze JS</a>
+                        <a class="dropdown-item" onclick="sendDataPY()">Analyze PY</a>
                         <div class="dropdown-divider"></div>
                         <a class="dropdown-item" id="saveFile">Save Traductor JS file</a>
                         <a class="dropdown-item" id="saveFileCompare">Save Traductos Python file</a>
@@ -51,9 +52,13 @@
                         Reports
                     </a>
                     <div class="dropdown-menu" aria-labelledby="navbarReporte">
-                        <a class="dropdown-item" id="errorReport">Download Errors Report</a>
-                        <a class="dropdown-item" id="traduccion">Download Traduccion</a>
-                        <a class="dropdown-item" id="tokenReport">Download Tokens Report</a>
+                        <a class="dropdown-item" id="errorReportJS">Download Errors Report JS</a>
+                        <a class="dropdown-item" id="traduccionJS">Download Traduccion JS</a>
+                        <a class="dropdown-item" id="tokenReportJS">Download Tokens Report JS</a>
+                        <a class="dropdown-item" id="errorReportPY">Download Errors Report PY</a>
+                        <a class="dropdown-item" id="traduccionPY">Download Traduccion PY</a>
+                        <a class="dropdown-item" id="tokenReportPY">Download Tokens Report PY</a>
+                        <a class="dropdown-item" id="traducciones">Download Traducciones</a>
                     </div>
                 </li>
             </ul>
@@ -96,23 +101,34 @@
                             <li class="nav-item">
                                 <a class="custom-navLink nav-link" href="#secondaryEditorTab" data-toggle="tab">Editor</a>
                             </li>
+                            <li class="nav-item">
+                                <a class="custom-navLink nav-link" href="#secondaryASTTab" data-toggle="tab">AST</a>
+                            </li>
                         </ul>
                     </div>
                 </nav>
 
                 <div class="tab-content">
                     <div class="tab-pane active" id="secondaryEditorTab">
-                        <textarea id="comparatorEditor"></textarea>
+                        <textarea id="secondaryEditor"></textarea>
                     </div>
 
+                    <div class="tab-pane" id="secondaryASTTab">
+                        <div class="astPanel" id="astDiv2"></div>
+                    </div>
                 </div>
             </div>
         </div>
         <br>
 
         <div class="row" id="consoleSection">
-            <div class="col-12 col-lg-12">
+            <div class="col-12 col-lg-6">
+                <h1 style="text-align: center; color: white; background-color: yellow;">Consola JS</h1>
                 <textarea class="consoleEditor" id="consoleEditor"></textarea>
+            </div>
+            <div class="col-12 col-lg-6">
+                <h1 style="text-align: center; color: white; background-color: mediumblue;">Consola PY</h1>
+                <textarea class="consoleEditorPY" id="consoleEditorPY"></textarea>
             </div>
         </div>
         <br>
@@ -133,7 +149,7 @@
     <script src="https://unpkg.com/d3-graphviz@2.1.0/build/d3-graphviz.min.js"></script>
 
     <script src="//ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
-    <script type="application/javascript" src="/templates/assets/js/start.js"></script>
+    <script type="application/javascript" src="/templates/assets/js/app.js"></script>
 </body>
 
 </html>

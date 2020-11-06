@@ -31,7 +31,7 @@ stringContent           ({stringType}((?:\\{stringType}|(?:(?!{stringType}).))*)
 
 %%
 \s+                     /* skip whitespace */
-{comentarioMultilinea}    {listTokens.append(new Token(idToken,"commentMultilineaOrUnilinea",yytext,yylloc.first_line,yylloc.first_column)); idToken++; traduccion +=  yytext + "\n";}  /* skip Single Line Comment AND Multiline Comment */
+{comentarioMultilinea}    {listTokens.append(new Token(idToken,"commentMultilineaOrUnilinea",yytext,yylloc.first_line,yylloc.first_column)); idToken++; traduccion +=  yytext + "\n";}
 
 "{"                     {listTokens.append(new Token(idToken,"SYM_LLAVEA",yytext,yylloc.first_line,yylloc.first_column)); idToken++; return '{';}
 "}"                     {listTokens.append(new Token(idToken,"SYM_LLAVEC",yytext,yylloc.first_line,yylloc.first_column)); idToken++; return '}';}
@@ -356,6 +356,16 @@ EXPRESSION : EXPRESSION '+' EXPRESSION  {$$ = new Nodo('EXPRESSION'); $$.addChil
            | 'identifier'{$$ = new Nodo('EXPRESSION'); $$.addChildrens(new Nodo($1));
                           $$.traduccion += $1;}
 
+           | '++' 'identifier' {$$ = new Nodo('EXPRESSION'); $$.addChildrens(new Nodo($1)); $$.addChildrens(new Nodo($2));
+                                $$.traduccion += $1 + $2;}
+           | '--' 'identifier' {$$ = new Nodo('EXPRESSION'); $$.addChildrens(new Nodo($1)); $$.addChildrens(new Nodo($2));
+                                $$.traduccion += $1 + $2;}
+           | 'identifier' '++' {$$ = new Nodo('EXPRESSION'); $$.addChildrens(new Nodo($1)); $$.addChildrens(new Nodo($2));
+                                $$.traduccion += $1 + $2;}
+
+           | 'identifier' '--' {$$ = new Nodo('EXPRESSION'); $$.addChildrens(new Nodo($1)); $$.addChildrens(new Nodo($2));
+                                $$.traduccion += $1 + $2;}
+           
            | 'stringContent' {$$ = new Nodo('EXPRESSION'); $$.addChildrens(new Nodo($1)); $$.traduccion +=  '"' + $1 + '"';}
            | 'character' {$$ = new Nodo('EXPRESSION'); $$.addChildrens(new Nodo($1)); $$.traduccion += "'" + $1 + "'";}
            | 'decimal' {$$ = new Nodo('EXPRESSION'); $$.addChildrens(new Nodo($1)); $$.traduccion += $1;}

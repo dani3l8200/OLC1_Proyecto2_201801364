@@ -1,5 +1,5 @@
 class Error {
-    constructor(type, id, description, column, row) {
+    constructor(id, type, description, column, row) {
         this.id = id;
         this.description = description;
         this.type = type;

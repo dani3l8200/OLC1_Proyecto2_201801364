@@ -1,5 +1,6 @@
 const Token = require('../models/Token')
 const LinkedList = require('../controllers/LinkedList');
+const Errors = require('../models/Error');
 const SyntacticAnalyzer = require('./SintacticoPY');
 const GraficasAST = require('../controllers/GraficarAST');
 
@@ -8,6 +9,8 @@ const GraficasAST = require('../controllers/GraficarAST');
 class AnalizadorLexico {
     constructor() {
         this.state = 0;
+        this.idToken = 0;
+        this.idErrors = 0;
         this.auxLex = "";
         this.column = 0;
         this.row = 1;
@@ -163,6 +166,10 @@ class AnalizadorLexico {
                         this.auxLex += letra;
                         this.column += 1;
                         this.state = 16;
+                    } else if (letra === "'") {
+                        this.auxLex += letra;
+                        this.column += 1;
+                        this.state = 17;
                     } else if (letra === "^") {
                         this.auxLex += letra;
                         this.column += 1;
@@ -230,7 +237,7 @@ class AnalizadorLexico {
                         this.auxLex += letra;
                         this.state = 4;
                     } else {
-                        this.auxLex += letra;
+                        this.auxLex += "\\" + letra;
                         this.addTokens("TK_CADENA");
                     }
                     break;
@@ -354,6 +361,15 @@ class AnalizadorLexico {
                         this.auxLex = "";
                     }
                     break;
+                case 17:
+                    if (letra != "'") {
+                        this.state = 17;
+                        this.auxLex += letra;
+                    } else {
+                        this.auxLex += letra;
+                        this.addTokens("TK_CARACTER");
+                    }
+                    break;
                 default:
                     break;
             }
@@ -362,13 +378,13 @@ class AnalizadorLexico {
     }
 
     addTokens(Type) {
-        this.ListTokens.append(new Token(this.auxLex, Type, this.column, this.row));
+        this.ListTokens.append(new Token(++this.idToken, this.auxLex, Type, this.column, this.row));
         this.auxLex = "";
         this.state = 0;
     }
 
     addErrors(Type) {
-        this.ListErrors.append(new Token(this.auxLex, Type, this.column, this.row));
+        this.ListErrors.append(new Errors(++this.idErrors, "LEXICO", "ERROR EN " + Type, this.column, this.row));
         this.auxLex = "";
         this.state = 0;
     }
@@ -377,17 +393,16 @@ class AnalizadorLexico {
 }
 
 module.exports = AnalizadorLexico;
-const test = new AnalizadorLexico();
+/*const test = new AnalizadorLexico();
 let cadena = `public interface calificacion_1 {
-    public int metodo1(int a, int b, int c);
-
+    public int metodo1(int a, int b, int c)
+@
     public void metodo2(int d, int e, int w);
-     
 }`;
 test.AnalisisLexico(cadena);
 test.ListTokens.print();
 test.ListErrors.print();
-let sintacticoTest = new SyntacticAnalyzer(test.ListTokens);
+let sintacticoTest = new SyntacticAnalyzer(test.ListTokens, test.ListErrors);
 console.log(sintacticoTest.traductor.text);
 let graficar = new GraficasAST();
-console.log(graficar.generateString(sintacticoTest.ast));
+console.log(graficar.generateString(sintacticoTest.ast));*/
