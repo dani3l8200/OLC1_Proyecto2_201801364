@@ -1,0 +1,32 @@
+version: "3"
+
+services:
+    Fronted:
+        container_name: frontend
+        image: dani3l8200/goweb:v1
+        restart: always
+        build: ./frontend
+        ports: 
+            - "8080:8080"
+        volumes: 
+            - ./frontend:/go/src/app
+    traductorpy:
+            container_name: traductorpy
+            image: dani3l8200/traductorpy:v1
+            restart: always
+            build: ./backend/Traductor_Python
+            ports: 
+                - "4000:4000"
+            volumes:
+                - ./backend/Traductor_Python:/backend/Traductor_PY
+                - /backend/Traductor_PY/node_modules
+    traductorjs:
+            container_name: traductorjs
+            image: dani3l8200/traductorjs:v1
+            restart:  always
+            build: ./backend/Traductor_JS
+            ports: 
+                - "3000:3000"
+            volumes: 
+                - ./backend/Traductor_JS:/backend/Traductor_JS
+                - /backend/Traductor_JS/node_modules

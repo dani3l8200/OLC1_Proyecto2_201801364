@@ -6,7 +6,7 @@ const ASTReport = require('../controllers/GraficasASTJS');
 const beautify = require('js-beautify').js;
 let Router = express.Router();
 Router.get('/', (req, res) => {
-    res.send('Traductor JS/Python');
+    res.send('Traductor JS');
 })
 
 Router.post('/TraductorJS', (req, res) => {
@@ -16,12 +16,12 @@ Router.post('/TraductorJS', (req, res) => {
         let test = JSON.parse(auxData)
         const arrayReturnToString = parser.parse(test);
         if (arrayReturnToString.length > 1 && arrayReturnToString.length <= 3) {
-            
+
             let ast = new ASTReport();
             let astString = ast.generateString(arrayReturnToString[0]);
             let lexico = new ReportLexico(arrayReturnToString[2]);
             let reportLexico = lexico.getReport();
-            let traduccion = beautify(arrayReturnToString[1],{ indent_size: 4, space_in_empty_paren: true, "space_after_anon_function": true, "space_after_named_function": true,"brace_style": "collapse"});
+            let traduccion = beautify(arrayReturnToString[1], { indent_size: 4, space_in_empty_paren: true, "space_after_anon_function": true, "space_after_named_function": true, "brace_style": "collapse" });
             console.log(traduccion);
             let results = {
                 'AstDot': astString,
