@@ -19,3 +19,4 @@ Este proyecto fue realizado con las siguientes herramientas:
 * CSS
 * JavaScript
 
+Nota Obtenida: 97/100
